@@ -1,49 +1,23 @@
 import sys
-if not sys.hexversion > 0x03000000:
-    version = 2
-else:
-    version = 3
-if len(sys.argv) > 1 and sys.argv[1] == "-cli":
-    print("Starting command line chat")
-    isCLI = True
-else:
-    isCLI = False
 
-
-if version == 3:
-    from tkinter import *
-    from tkinter.filedialog import asksaveasfilename
+from tkinter import *
 import threading
 import socket
-import random
-import math
-
 
 # GLOBALS
 conn_array = []  # stores open sockets
-secret_array = dict()  # key: the open sockets in conn_array,
-                        # value: integers for encryption
+# value: integers for encryption
 username_array = dict()  # key: the open sockets in conn_array,
-                        # value: usernames for the connection
+# value: usernames for the connection
 contact_array = dict()  # key: ip address as a string, value: [port, username]
 
 username = "Self"
 
-location = "192.168.1.68"
-port = "3300"
+location = 0
+port = 0
 top = ""
 
 main_body_text = 0
-
-def refract(binary):
-    """Returns the string representation of the binary.
-    Has trouble with spaces.
-    """
-    master = ""
-    for x in range(0, int(len(binary) / 7)):
-        master += chr(int(binary[x * 7: (x + 1) * 7], 2) + 0)
-    return master
-
 
 def formatNumber(number):
     """Ensures that number is at least length 4 by
@@ -54,8 +28,10 @@ def formatNumber(number):
         temp = '0' + temp
     return temp
 
-def netThrow(conn, secret, message):
-    """Sends message through the open socket conn. Sends the length of the incoming message, then sends the actual
+
+def netThrow(conn, message):
+    """Sends message through the open socket conn with the encryption key
+    secret. Sends the length of the incoming message, then sends the actual
     message.
     """
     try:
@@ -67,9 +43,10 @@ def netThrow(conn, secret, message):
                 "Connection issue. Sending message failed.", "System")
             processFlag("-001")
 
+
 def netCatch(conn):
-    """Receive and return the message through open socket conn.
-     If the message length begins with - instead of a number,
+    """Receive and return the message through open socket conn, decrypting
+    using key secret. If the message length begins with - instead of a number,
     process as a flag and return 1.
     """
     try:
@@ -78,23 +55,12 @@ def netCatch(conn):
             processFlag(data.decode(), conn)
             return 1
         data = conn.recv(int(data.decode()))
-        return refract(data.decode())
+        return data.decode()
     except socket.error:
         if len(conn_array) != 0:
             writeToScreen(
                 "Connection issue. Receiving message failed.", "System")
         processFlag("-001")
-
-def isPrime(number):
-    """Checks to see if a number is prime."""
-    x = 1
-    if number == 2 or number == 3:
-        return True
-    while x < math.sqrt(number):
-        x += 1
-        if number % x == 0:
-            return False
-    return True
 
 def processFlag(number, conn=None):
     """Process the flag corresponding to number, using open socket conn
@@ -102,7 +68,6 @@ def processFlag(number, conn=None):
     """
     global statusConnect
     global conn_array
-    global secret_array
     global username_array
     global contact_array
     global isCLI
@@ -112,7 +77,6 @@ def processFlag(number, conn=None):
         # client
         if len(conn_array) == 1:
             writeToScreen("Connection closed.", "System")
-            dump = secret_array.pop(conn_array[0])
             dump = conn_array.pop()
             try:
                 dump.close()
@@ -125,14 +89,13 @@ def processFlag(number, conn=None):
 
         if conn != None:
             writeToScreen("Connect to " + conn.getsockname()
-                          [0] + " closed.", "System")
-            dump = secret_array.pop(conn)
+            [0] + " closed.", "System")
             conn_array.remove(conn)
             conn.close()
 
     if t == 2:  # username change
-        name = netCatch(conn, secret_array[conn])
-        if(isUsernameFree(name)):
+        name = netCatch(conn)
+        if (isUsernameFree(name)):
             writeToScreen(
                 "User " + username_array[conn] + " has changed their username to " + name, "System")
             username_array[conn] = name
@@ -147,10 +110,11 @@ def processFlag(number, conn=None):
         Client(data.decode(),
                int(contact_array[conn.getpeername()[0]][0])).start()
 
+
 def processUserCommands(command, param):
     """Processes commands passed in via the / text input."""
     global conn_array
-    global secret_array
+
     global username
 
     if command == "nick":  # change nickname
@@ -165,7 +129,7 @@ def processUserCommands(command, param):
             writeToScreen("Username is being changed to " + param[0], "System")
             for conn in conn_array:
                 conn.send("-002".encode())
-                netThrow(conn, secret_array[conn], param[0])
+                netThrow(conn, param[0])
             username = param[0]
         else:
             writeToScreen(param[0] +
@@ -175,11 +139,12 @@ def processUserCommands(command, param):
             conn.send("-001".encode())
         processFlag("-001")
     if command == "connect":  # connects to passed in host port
-        if(options_sanitation(param[1], param[0])):
+        if (options_sanitation(param[1], param[0])):
             Client(param[0], int(param[1])).start()
     if command == "host":  # starts server on passed in port
-        if(options_sanitation(param[0])):
+        if (options_sanitation(param[0])):
             Server(int(param[0])).start()
+
 
 def isUsernameFree(name):
     """Checks to see if the username name is free for use."""
@@ -189,6 +154,7 @@ def isUsernameFree(name):
         if name == username_array[conn] or name == username:
             return False
     return True
+
 
 def passFriends(conn):
     """Sends conn all of the people currently in conn_array so they can connect
@@ -201,8 +167,11 @@ def passFriends(conn):
             conn.send(
                 formatNumber(len(connection.getpeername()[0])).encode())  # pass the ip address
             conn.send(connection.getpeername()[0].encode())
+            # conn.send(formatNumber(len(connection.getpeername()[1])).encode()) #pass the port number
+            # conn.send(connection.getpeername()[1].encode())
 
-#--------------------------------------------------------------------------
+
+# --------------------------------------------------------------------------
 
 def client_options_window(master):
     """Launches client options window for getting destination hostname
@@ -220,8 +189,9 @@ def client_options_window(master):
     port = Entry(top)
     port.grid(row=1, column=1)
     go = Button(top, text="Connect", command=lambda:
-                client_options_go(location.get(), port.get(), top))
+    client_options_go(location.get(), port.get(), top))
     go.grid(row=2, column=1)
+
 
 def client_options_go(dest, port, window):
     "Processes the options entered by the user in the client options window."""
@@ -231,6 +201,7 @@ def client_options_go(dest, port, window):
         Client(dest, int(port)).start()
     elif isCLI:
         sys.exit(1)
+
 
 def options_sanitation(por, loc=""):
     """Checks to make sure the port and destination ip are both valid.
@@ -253,6 +224,7 @@ def options_sanitation(por, loc=""):
             return False
     return True
 
+
 def ip_process(ipArray):
     """Checks to make sure every section of the ip is a valid number."""
     if len(ipArray) != 4:
@@ -267,7 +239,8 @@ def ip_process(ipArray):
             return False
     return True
 
-#------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 
 def server_options_window(master):
     """Launches server options window for getting port."""
@@ -280,8 +253,9 @@ def server_options_window(master):
     port.grid(row=0, column=1)
     port.focus_set()
     go = Button(top, text="Launch", command=lambda:
-                server_options_go(port.get(), top))
+    server_options_go(port.get(), top))
     go.grid(row=1, column=1)
+
 
 def server_options_go(port, window):
     """Processes the options entered by the user in the
@@ -294,7 +268,8 @@ def server_options_go(port, window):
     elif isCLI:
         sys.exit(1)
 
-#-------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------
 
 def username_options_window(master):
     """Launches username options window for setting username."""
@@ -306,7 +281,7 @@ def username_options_window(master):
     name.focus_set()
     name.grid(row=0, column=1)
     go = Button(top, text="Change", command=lambda:
-                username_options_go(name.get(), top))
+    username_options_go(name.get(), top))
     go.grid(row=1, column=1)
 
 
@@ -317,7 +292,8 @@ def username_options_go(name, window):
     processUserCommands("nick", [name])
     window.destroy()
 
-#-------------------------------------------------------------------------
+
+# -------------------------------------------------------------------------
 
 def error_window(master, texty):
     """Launches a new window to display the message texty."""
@@ -333,6 +309,7 @@ def error_window(master, texty):
         go.pack()
         go.focus_set()
 
+
 def optionDelete(window):
     connecter.config(state=NORMAL)
     window.destroy()
@@ -345,11 +322,11 @@ def placeText(text):
     everyone this program is connected to.
     """
     global conn_array
-    global secret_array
     global username
     writeToScreen(text, username)
     for person in conn_array:
-        netThrow(person, secret_array[person], text)
+        netThrow(person, text)
+
 
 def writeToScreen(text, username=""):
     """Places text to main text body in format "username: text"."""
@@ -368,6 +345,7 @@ def writeToScreen(text, username=""):
         main_body_text.insert(END, text)
         main_body_text.yview(END)
         main_body_text.config(state=DISABLED)
+
 
 def processUserText(event):
     """Takes text from text bar input and calls processUserCommands if it
@@ -399,10 +377,11 @@ def processUserInput(text):
         processUserCommands(command, params)
 
 
-#-------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 
-class Server (threading.Thread):
+class Server(threading.Thread):
     "A class for a Server instance."""
+
     def __init__(self, port):
         threading.Thread.__init__(self)
         self.port = port
@@ -420,6 +399,7 @@ class Server (threading.Thread):
         global conn_init
         conn_init, addr_init = s.accept()
         serv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        serv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         serv.bind(('', 0))  # get a random empty port
         serv.listen(1)
 
@@ -438,34 +418,6 @@ class Server (threading.Thread):
         statusConnect.set("Disconnect")
         connecter.config(state=NORMAL)
 
-        # # create the numbers for my encryption
-        # prime = random.randint(1000, 9000)
-        # while not isPrime(prime):
-        #     prime = random.randint(1000, 9000)
-        # base = random.randint(20, 100)
-        # a = random.randint(20, 100)
-        #
-        # # send the numbers (base, prime, A)
-        # conn.send(formatNumber(len(str(base))).encode())
-        # conn.send(str(base).encode())
-        #
-        # conn.send(formatNumber(len(str(prime))).encode())
-        # conn.send(str(prime).encode())
-        #
-        # conn.send(formatNumber(len(str(pow(base, a) % prime))).encode())
-        # conn.send(str(pow(base, a) % prime).encode())
-
-        # get B
-        data = conn.recv(4)
-        data = conn.recv(int(data.decode()))
-        b = int(data.decode())
-
-        # calculate the encryption key
-        # global secret_array
-        # secret = pow(b, a) % prime
-        # # store the encryption key by the connection
-        # secret_array[conn] = secret
-
         conn.send(formatNumber(len(username)).encode())
         conn.send(username.encode())
 
@@ -479,12 +431,13 @@ class Server (threading.Thread):
             contact_array[str(addr[0])] = [str(self.port), "No_nick"]
 
         passFriends(conn)
-        threading.Thread(target=Runner, args=(conn, 0)).start()
+        threading.Thread(target=Runner, args=(conn,)).start()
         Server(self.port).start()
 
 
-class Client (threading.Thread):
+class Client(threading.Thread):
     """A class for a Client instance."""
+
     def __init__(self, host, port):
         threading.Thread.__init__(self)
         self.port = port
@@ -492,8 +445,8 @@ class Client (threading.Thread):
 
     def run(self):
         global conn_array
-        global secret_array
         conn_init = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        conn_init.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         conn_init.settimeout(5.0)
         try:
             conn_init.connect((self.host, self.port))
@@ -520,22 +473,6 @@ class Client (threading.Thread):
         connecter.config(state=NORMAL)
 
         conn_array.append(conn)
-        # get my base, prime, and A values
-        data = conn.recv(4)
-        data = conn.recv(int(data.decode()))
-        base = int(data.decode())
-        data = conn.recv(4)
-        data = conn.recv(int(data.decode()))
-        prime = int(data.decode())
-        data = conn.recv(4)
-        data = conn.recv(int(data.decode()))
-        a = int(data.decode())
-        b = random.randint(20, 100)
-        # send the B value
-        conn.send(formatNumber(len(base)).encode())
-        conn.send(str(pow(base, b) % prime).encode())
-        # secret = pow(a, b) % prime
-        # secret_array[conn] = secret
 
         conn.send(formatNumber(len(username)).encode())
         conn.send(username.encode())
@@ -549,7 +486,8 @@ class Client (threading.Thread):
         else:
             username_array[conn] = self.host
             contact_array[conn.getpeername()[0]] = [str(self.port), "No_nick"]
-        threading.Thread(target=Runner, args=(conn, 0)).start()
+        threading.Thread(target=Runner, args=(conn,)).start()
+
 
 def Runner(conn):
     global username_array
@@ -557,6 +495,7 @@ def Runner(conn):
         data = netCatch(conn)
         if data != 1:
             writeToScreen(data, username_array[conn])
+
 
 def connects(clientType):
     global conn_array
@@ -583,52 +522,47 @@ def toTwo():
     clientType = 1
 
 
-#-------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 
+root = Tk()
+root.title("Chat")
 
-if len(sys.argv) > 1 and sys.argv[1] == "-cli":
-    print("Starting command line chat")
+menubar = Menu(root)
 
-else:
-    root = Tk()
-    root.title("Chat")
+file_menu = Menu(menubar, tearoff=0)
+menubar.add_command(label="Change username",
+                    command=lambda: username_options_window(root))
+menubar.add_command(label="Exit", command=lambda: root.destroy())
 
-    menubar = Menu(root)
+root.config(menu=menubar)
 
-    file_menu = Menu(menubar, tearoff=0)
-    menubar.add_command(label="Change username",
-                          command=lambda: username_options_window(root))
-    menubar.add_command(label="Exit", command=lambda: root.destroy())
+main_body = Frame(root, height=20, width=50)
 
-    root.config(menu=menubar)
+main_body_text = Text(main_body)
+body_text_scroll = Scrollbar(main_body)
+main_body_text.focus_set()
+body_text_scroll.pack(side=RIGHT, fill=Y)
+main_body_text.pack(side=LEFT, fill=Y)
+body_text_scroll.config(command=main_body_text.yview)
+main_body_text.config(yscrollcommand=body_text_scroll.set)
+main_body.pack()
 
-    main_body = Frame(root, height=20, width=50)
+main_body_text.insert(END, "Welcome to the chat program!")
+main_body_text.config(state=DISABLED)
 
-    main_body_text = Text(main_body)
-    body_text_scroll = Scrollbar(main_body)
-    main_body_text.focus_set()
-    body_text_scroll.pack(side=RIGHT, fill=Y)
-    main_body_text.pack(side=LEFT, fill=Y)
-    body_text_scroll.config(command=main_body_text.yview)
-    main_body_text.config(yscrollcommand=body_text_scroll.set)
-    main_body.pack()
+text_input = Entry(root, width=60)
+text_input.bind("<Return>", processUserText)
+text_input.pack()
 
-    main_body_text.insert(END, "Welcome to the chat program!")
-    main_body_text.config(state=DISABLED)
+statusConnect = StringVar()
+statusConnect.set("Connect")
+clientType = 1
+Radiobutton(root, text="Client", variable=clientType,
+            value=0, command=toOne).pack(anchor=E)
+Radiobutton(root, text="Server", variable=clientType,
+            value=1, command=toTwo).pack(anchor=E)
+connecter = Button(root, textvariable=statusConnect,
+                   command=lambda: connects(clientType))
+connecter.pack()
 
-    text_input = Entry(root, width=60)
-    text_input.bind("<Return>", processUserText)
-    text_input.pack()
-
-    statusConnect = StringVar()
-    statusConnect.set("Connect")
-    clientType = 1
-    Radiobutton(root, text="Client", variable=clientType,
-                value=0, command=toOne).pack(anchor=E)
-    Radiobutton(root, text="Server", variable=clientType,
-                value=1, command=toTwo).pack(anchor=E)
-    connecter = Button(root, textvariable=statusConnect,
-                       command=lambda: connects(clientType))
-    connecter.pack()
-
-    root.mainloop()
+root.mainloop()
