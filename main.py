@@ -707,38 +707,38 @@ def Runner(conn, secret):
 #-------------------------------------------------------------------------
 # Menu helpers
 
-def QuickClient():
-    """Menu window for connection options."""
-    window = Toplevel(root)
-    window.title("Connection options")
-    window.grab_set()
-    Label(window, text="Server IP:").grid(row=0)
-    destination = Entry(window)
-    destination.grid(row=0, column=1)
-    go = Button(window, text="Connect", command=lambda:
-                client_options_go(destination.get(), "9999", window))
-    go.grid(row=1, column=1)
+# def QuickClient():
+#     """Menu window for connection options."""
+#     window = Toplevel(root)
+#     window.title("Connection options")
+#     window.grab_set()
+#     Label(window, text="Server IP:").grid(row=0)
+#     destination = Entry(window)
+#     destination.grid(row=0, column=1)
+#     go = Button(window, text="Connect", command=lambda:
+#                 client_options_go(destination.get(), "9999", window))
+#     go.grid(row=1, column=1)
 
 
-def QuickServer():
-    """Quickstarts a server."""
-    Server(9999).start()
+# def QuickServer():
+#     """Quickstarts a server."""
+#     Server(9999).start()
 
-def saveHistory():
-    """Saves history with Tkinter's asksaveasfilename dialog."""
-    global main_body_text
-    file_name = asksaveasfilename(
-        title="Choose save location",
-        filetypes=[('Plain text', '*.txt'), ('Any File', '*.*')])
-    try:
-        filehandle = open(file_name + ".txt", "w")
-    except IOError:
-        print("Can't save history.")
-        return
-    contents = main_body_text.get(1.0, END)
-    for line in contents:
-        filehandle.write(line)
-    filehandle.close()
+# def saveHistory():
+#     """Saves history with Tkinter's asksaveasfilename dialog."""
+#     global main_body_text
+#     file_name = asksaveasfilename(
+#         title="Choose save location",
+#         filetypes=[('Plain text', '*.txt'), ('Any File', '*.*')])
+#     try:
+#         filehandle = open(file_name + ".txt", "w")
+#     except IOError:
+#         print("Can't save history.")
+#         return
+#     contents = main_body_text.get(1.0, END)
+#     for line in contents:
+#         filehandle.write(line)
+#     filehandle.close()
 
 
 def connects(clientType):
@@ -780,24 +780,24 @@ else:
 
     file_menu = Menu(menubar, tearoff=0)
     file_menu.add_command(label="Save chat", command=lambda: saveHistory())
-    file_menu.add_command(label="Change username",
+    menubar.add_command(label="Change username",
                           command=lambda: username_options_window(root))
-    file_menu.add_command(label="Exit", command=lambda: root.destroy())
-    menubar.add_cascade(label="File", menu=file_menu)
+    menubar.add_command(label="Exit", command=lambda: root.destroy())
+    # menubar.add_cascade(label="File", menu=file_menu)
 
-    connection_menu = Menu(menubar, tearoff=0)
-    connection_menu.add_command(label="Quick Connect", command=QuickClient)
-    connection_menu.add_command(
-        label="Connect on port", command=lambda: client_options_window(root))
-    connection_menu.add_command(
-        label="Disconnect", command=lambda: processFlag("-001"))
-    menubar.add_cascade(label="Connect", menu=connection_menu)
+    # connection_menu = Menu(menubar, tearoff=0)
+    # connection_menu.add_command(label="Quick Connect", command=QuickClient)
+    # connection_menu.add_command(
+    #     label="Connect on port", command=lambda: client_options_window(root))
+    # connection_menu.add_command(
+    #     label="Disconnect", command=lambda: processFlag("-001"))
+    # menubar.add_cascade(label="Connect", menu=connection_menu)
 
-    server_menu = Menu(menubar, tearoff=0)
-    server_menu.add_command(label="Launch server", command=QuickServer)
-    server_menu.add_command(label="Listen on port",
-                            command=lambda: server_options_window(root))
-    menubar.add_cascade(label="Server", menu=server_menu)
+    # server_menu = Menu(menubar, tearoff=0)
+    # server_menu.add_command(label="Launch server", command=QuickServer)
+    # server_menu.add_command(label="Listen on port",
+    #                         command=lambda: server_options_window(root))
+    # menubar.add_cascade(label="Server", menu=server_menu)
 
     # menubar.add_command(label="Contacts", command=lambda:
     #                     contacts_window(root))
