@@ -12,7 +12,6 @@ username_array = dict()  # key: the open sockets in conn_array,
 contact_array = dict()  # key: ip address as a string, value: [port, username]
 
 username = "Self"
-
 location = 0
 port = 0
 top = ""
@@ -70,7 +69,6 @@ def processFlag(number, conn=None):
     global conn_array
     global username_array
     global contact_array
-    global isCLI
     t = int(number[1:])
     if t == 1:  # disconnect
         # in the event of single connection being left or if we're just a
@@ -82,9 +80,8 @@ def processFlag(number, conn=None):
                 dump.close()
             except socket.error:
                 print("Issue with someone being bad about disconnecting")
-            if not isCLI:
-                statusConnect.set("Connect")
-                connecter.config(state=NORMAL)
+            statusConnect.set("Connect")
+            connecter.config(state=NORMAL)
             return
 
         if conn != None:
@@ -120,10 +117,7 @@ def processUserCommands(command, param):
     if command == "nick":  # change nickname
         for letter in param[0]:
             if letter == " " or letter == "\n":
-                if isCLI:
-                    error_window(0, "Invalid username. No spaces allowed.")
-                else:
-                    error_window(root, "Invalid username. No spaces allowed.")
+                error_window(root, "Invalid username. No spaces allowed.")
                 return
         if isUsernameFree(param[0]):
             writeToScreen("Username is being changed to " + param[0], "System")
@@ -196,11 +190,8 @@ def client_options_window(master):
 def client_options_go(dest, port, window):
     "Processes the options entered by the user in the client options window."""
     if options_sanitation(port, dest):
-        if not isCLI:
-            window.destroy()
+        window.destroy()
         Client(dest, int(port)).start()
-    elif isCLI:
-        sys.exit(1)
 
 
 def options_sanitation(por, loc=""):
@@ -208,10 +199,6 @@ def options_sanitation(por, loc=""):
     Launches error windows if there are any issues.
     """
     global root
-    if version == 2:
-        por = unicode(por)
-    if isCLI:
-        root = 0
     if not por.isdigit():
         error_window(root, "Please input a port number.")
         return False
@@ -230,8 +217,6 @@ def ip_process(ipArray):
     if len(ipArray) != 4:
         return False
     for ip in ipArray:
-        if version == 2:
-            ip = unicode(ip)
         if not ip.isdigit():
             return False
         t = int(ip)
@@ -262,11 +247,8 @@ def server_options_go(port, window):
     server options window.
     """
     if options_sanitation(port):
-        if not isCLI:
-            window.destroy()
+        window.destroy()
         Server(int(port)).start()
-    elif isCLI:
-        sys.exit(1)
 
 
 # -------------------------------------------------------------------------
@@ -297,17 +279,13 @@ def username_options_go(name, window):
 
 def error_window(master, texty):
     """Launches a new window to display the message texty."""
-    global isCLI
-    if isCLI:
-        writeToScreen(texty, "System")
-    else:
-        window = Toplevel(master)
-        window.title("ERROR")
-        window.grab_set()
-        Label(window, text=texty).pack()
-        go = Button(window, text="OK", command=window.destroy)
-        go.pack()
-        go.focus_set()
+    window = Toplevel(master)
+    window.title("ERROR")
+    window.grab_set()
+    Label(window, text=texty).pack()
+    go = Button(window, text="OK", command=window.destroy)
+    go.pack()
+    go.focus_set()
 
 
 def optionDelete(window):
@@ -331,20 +309,13 @@ def placeText(text):
 def writeToScreen(text, username=""):
     """Places text to main text body in format "username: text"."""
     global main_body_text
-    global isCLI
-    if isCLI:
-        if username:
-            print(username + ": " + text)
-        else:
-            print(text)
-    else:
-        main_body_text.config(state=NORMAL)
-        main_body_text.insert(END, '\n')
-        if username:
-            main_body_text.insert(END, username + ": ")
-        main_body_text.insert(END, text)
-        main_body_text.yview(END)
-        main_body_text.config(state=DISABLED)
+    main_body_text.config(state=NORMAL)
+    main_body_text.insert(END, '\n')
+    if username:
+        main_body_text.insert(END, username + ": ")
+    main_body_text.insert(END, text)
+    main_body_text.yview(END)
+    main_body_text.config(state=DISABLED)
 
 
 def processUserText(event):
@@ -524,45 +495,50 @@ def toTwo():
 
 # -------------------------------------------------------------------------
 
-root = Tk()
-root.title("Chat")
 
-menubar = Menu(root)
+if len(sys.argv) > 1 and sys.argv[1] == "-cli":
+    print("Starting command line chat")
 
-file_menu = Menu(menubar, tearoff=0)
-menubar.add_command(label="Change username",
-                    command=lambda: username_options_window(root))
-menubar.add_command(label="Exit", command=lambda: root.destroy())
+else:
+    root = Tk()
+    root.title("Chat")
 
-root.config(menu=menubar)
+    menubar = Menu(root)
 
-main_body = Frame(root, height=20, width=50)
+    file_menu = Menu(menubar, tearoff=0)
+    menubar.add_command(label="Change username",
+                        command=lambda: username_options_window(root))
+    menubar.add_command(label="Exit", command=lambda: root.destroy())
 
-main_body_text = Text(main_body)
-body_text_scroll = Scrollbar(main_body)
-main_body_text.focus_set()
-body_text_scroll.pack(side=RIGHT, fill=Y)
-main_body_text.pack(side=LEFT, fill=Y)
-body_text_scroll.config(command=main_body_text.yview)
-main_body_text.config(yscrollcommand=body_text_scroll.set)
-main_body.pack()
+    root.config(menu=menubar)
 
-main_body_text.insert(END, "Welcome to the chat program!")
-main_body_text.config(state=DISABLED)
+    main_body = Frame(root, height=20, width=50)
 
-text_input = Entry(root, width=60)
-text_input.bind("<Return>", processUserText)
-text_input.pack()
+    main_body_text = Text(main_body)
+    body_text_scroll = Scrollbar(main_body)
+    main_body_text.focus_set()
+    body_text_scroll.pack(side=RIGHT, fill=Y)
+    main_body_text.pack(side=LEFT, fill=Y)
+    body_text_scroll.config(command=main_body_text.yview)
+    main_body_text.config(yscrollcommand=body_text_scroll.set)
+    main_body.pack()
 
-statusConnect = StringVar()
-statusConnect.set("Connect")
-clientType = 1
-Radiobutton(root, text="Client", variable=clientType,
-            value=0, command=toOne).pack(anchor=E)
-Radiobutton(root, text="Server", variable=clientType,
-            value=1, command=toTwo).pack(anchor=E)
-connecter = Button(root, textvariable=statusConnect,
-                   command=lambda: connects(clientType))
-connecter.pack()
+    main_body_text.insert(END, "Welcome to the chat program!")
+    main_body_text.config(state=DISABLED)
 
-root.mainloop()
+    text_input = Entry(root, width=60)
+    text_input.bind("<Return>", processUserText)
+    text_input.pack()
+
+    statusConnect = StringVar()
+    statusConnect.set("Connect")
+    clientType = 1
+    Radiobutton(root, text="Client", variable=clientType,
+                value=0, command=toOne).pack(anchor=E)
+    Radiobutton(root, text="Server", variable=clientType,
+                value=1, command=toTwo).pack(anchor=E)
+    connecter = Button(root, textvariable=statusConnect,
+                       command=lambda: connects(clientType))
+    connecter.pack()
+
+    root.mainloop()
