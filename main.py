@@ -29,8 +29,8 @@ contact_array = dict()  # key: ip address as a string, value: [port, username]
 
 username = "Self"
 
-location = '192.168.1.30'
-port = 3300
+location = "192.168.1.68"
+port = "3300"
 top = ""
 
 main_body_text = 0
@@ -374,110 +374,110 @@ def optionDelete(window):
 #-----------------------------------------------------------------------------
 # Contacts window
 
-def contacts_window(master):
-    """Displays the contacts window, allowing the user to select a recent
-    connection to reuse.
-    """
-    global contact_array
-    cWindow = Toplevel(master)
-    cWindow.title("Contacts")
-    cWindow.grab_set()
-    scrollbar = Scrollbar(cWindow, orient=VERTICAL)
-    listbox = Listbox(cWindow, yscrollcommand=scrollbar.set)
-    scrollbar.config(command=listbox.yview)
-    scrollbar.pack(side=RIGHT, fill=Y)
-    buttons = Frame(cWindow)
-    cBut = Button(buttons, text="Connect",
-                  command=lambda: contacts_connect(
-                                      listbox.get(ACTIVE).split(" ")))
-    cBut.pack(side=LEFT)
-    dBut = Button(buttons, text="Remove",
-                  command=lambda: contacts_remove(
-                                      listbox.get(ACTIVE).split(" "), listbox))
-    dBut.pack(side=LEFT)
-    aBut = Button(buttons, text="Add",
-                  command=lambda: contacts_add(listbox, cWindow))
-    aBut.pack(side=LEFT)
-    buttons.pack(side=BOTTOM)
+# def contacts_window(master):
+#     """Displays the contacts window, allowing the user to select a recent
+#     connection to reuse.
+#     """
+#     global contact_array
+#     cWindow = Toplevel(master)
+#     cWindow.title("Contacts")
+#     cWindow.grab_set()
+#     scrollbar = Scrollbar(cWindow, orient=VERTICAL)
+#     listbox = Listbox(cWindow, yscrollcommand=scrollbar.set)
+#     scrollbar.config(command=listbox.yview)
+#     scrollbar.pack(side=RIGHT, fill=Y)
+#     buttons = Frame(cWindow)
+#     cBut = Button(buttons, text="Connect",
+#                   command=lambda: contacts_connect(
+#                                       listbox.get(ACTIVE).split(" ")))
+#     cBut.pack(side=LEFT)
+#     dBut = Button(buttons, text="Remove",
+#                   command=lambda: contacts_remove(
+#                                       listbox.get(ACTIVE).split(" "), listbox))
+#     dBut.pack(side=LEFT)
+#     aBut = Button(buttons, text="Add",
+#                   command=lambda: contacts_add(listbox, cWindow))
+#     aBut.pack(side=LEFT)
+#     buttons.pack(side=BOTTOM)
 
-    for person in contact_array:
-        listbox.insert(END, contact_array[person][1] + " " +
-                       person + " " + contact_array[person][0])
-    listbox.pack(side=LEFT, fill=BOTH, expand=1)
+#     for person in contact_array:
+#         listbox.insert(END, contact_array[person][1] + " " +
+#                        person + " " + contact_array[person][0])
+#     listbox.pack(side=LEFT, fill=BOTH, expand=1)
 
-def contacts_connect(item):
-    """Establish a connection between two contacts."""
-    Client(item[1], int(item[2])).start()
+# def contacts_connect(item):
+#     """Establish a connection between two contacts."""
+#     Client(item[1], int(item[2])).start()
 
-def contacts_remove(item, listbox):
-    """Remove a contact."""
-    if listbox.size() != 0:
-        listbox.delete(ACTIVE)
-        global contact_array
-        h = contact_array.pop(item[1])
-
-
-def contacts_add(listbox, master):
-    """Add a contact."""
-    aWindow = Toplevel(master)
-    aWindow.title("Contact add")
-    Label(aWindow, text="Username:").grid(row=0)
-    name = Entry(aWindow)
-    name.focus_set()
-    name.grid(row=0, column=1)
-    Label(aWindow, text="IP:").grid(row=1)
-    ip = Entry(aWindow)
-    ip.grid(row=1, column=1)
-    Label(aWindow, text="Port:").grid(row=2)
-    port = Entry(aWindow)
-    port.grid(row=2, column=1)
-    go = Button(aWindow, text="Add", command=lambda:
-                contacts_add_helper(name.get(), ip.get(), port.get(),
-                                    aWindow, listbox))
-    go.grid(row=3, column=1)
+# def contacts_remove(item, listbox):
+#     """Remove a contact."""
+#     if listbox.size() != 0:
+#         listbox.delete(ACTIVE)
+#         global contact_array
+#         h = contact_array.pop(item[1])
 
 
-def contacts_add_helper(username, ip, port, window, listbox):
-    """Contact adding helper function. Recognizes invalid usernames and
-    adds contact to listbox and contact_array.
-    """
-    for letter in username:
-        if letter == " " or letter == "\n":
-            error_window(root, "Invalid username. No spaces allowed.")
-            return
-    if options_sanitation(port, ip):
-        listbox.insert(END, username + " " + ip + " " + port)
-        contact_array[ip] = [port, username]
-        window.destroy()
-        return
+# def contacts_add(listbox, master):
+#     """Add a contact."""
+#     aWindow = Toplevel(master)
+#     aWindow.title("Contact add")
+#     Label(aWindow, text="Username:").grid(row=0)
+#     name = Entry(aWindow)
+#     name.focus_set()
+#     name.grid(row=0, column=1)
+#     Label(aWindow, text="IP:").grid(row=1)
+#     ip = Entry(aWindow)
+#     ip.grid(row=1, column=1)
+#     Label(aWindow, text="Port:").grid(row=2)
+#     port = Entry(aWindow)
+#     port.grid(row=2, column=1)
+#     go = Button(aWindow, text="Add", command=lambda:
+#                 contacts_add_helper(name.get(), ip.get(), port.get(),
+#                                     aWindow, listbox))
+#     go.grid(row=3, column=1)
 
-def load_contacts():
-    """Loads the recent chats out of the persistent file contacts.dat."""
-    global contact_array
-    try:
-        filehandle = open("data\\contacts.dat", "r")
-    except IOError:
-        return
-    line = filehandle.readline()
-    while len(line) != 0:
-        temp = (line.rstrip('\n')).split(" ")  # format: ip, port, name
-        contact_array[temp[0]] = temp[1:]
-        line = filehandle.readline()
-    filehandle.close()
 
-def dump_contacts():
-    """Saves the recent chats to the persistent file contacts.dat."""
-    global contact_array
-    try:
-        filehandle = open("data\\contacts.dat", "w")
-    except IOError:
-        print("Can't dump contacts.")
-        return
-    for contact in contact_array:
-        filehandle.write(
-            contact + " " + str(contact_array[contact][0]) + " " +
-            contact_array[contact][1] + "\n")
-    filehandle.close()
+# def contacts_add_helper(username, ip, port, window, listbox):
+#     """Contact adding helper function. Recognizes invalid usernames and
+#     adds contact to listbox and contact_array.
+#     """
+#     for letter in username:
+#         if letter == " " or letter == "\n":
+#             error_window(root, "Invalid username. No spaces allowed.")
+#             return
+#     if options_sanitation(port, ip):
+#         listbox.insert(END, username + " " + ip + " " + port)
+#         contact_array[ip] = [port, username]
+#         window.destroy()
+#         return
+
+# def load_contacts():
+#     """Loads the recent chats out of the persistent file contacts.dat."""
+#     global contact_array
+#     try:
+#         filehandle = open("data\\contacts.dat", "r")
+#     except IOError:
+#         return
+#     line = filehandle.readline()
+#     while len(line) != 0:
+#         temp = (line.rstrip('\n')).split(" ")  # format: ip, port, name
+#         contact_array[temp[0]] = temp[1:]
+#         line = filehandle.readline()
+#     filehandle.close()
+
+# def dump_contacts():
+#     """Saves the recent chats to the persistent file contacts.dat."""
+#     global contact_array
+#     try:
+#         filehandle = open("data\\contacts.dat", "w")
+#     except IOError:
+#         print("Can't dump contacts.")
+#         return
+#     for contact in contact_array:
+#         filehandle.write(
+#             contact + " " + str(contact_array[contact][0]) + " " +
+#             contact_array[contact][1] + "\n")
+#     filehandle.close()
 
 #-----------------------------------------------------------------------------
 
@@ -707,38 +707,38 @@ def Runner(conn, secret):
 #-------------------------------------------------------------------------
 # Menu helpers
 
-# def QuickClient():
-#     """Menu window for connection options."""
-#     window = Toplevel(root)
-#     window.title("Connection options")
-#     window.grab_set()
-#     Label(window, text="Server IP:").grid(row=0)
-#     destination = Entry(window)
-#     destination.grid(row=0, column=1)
-#     go = Button(window, text="Connect", command=lambda:
-#                 client_options_go(destination.get(), "9999", window))
-#     go.grid(row=1, column=1)
+def QuickClient():
+    """Menu window for connection options."""
+    window = Toplevel(root)
+    window.title("Connection options")
+    window.grab_set()
+    Label(window, text="Server IP:").grid(row=0)
+    destination = Entry(window)
+    destination.grid(row=0, column=1)
+    go = Button(window, text="Connect", command=lambda:
+                client_options_go(destination.get(), "9999", window))
+    go.grid(row=1, column=1)
 
 
-# def QuickServer():
-#     """Quickstarts a server."""
-#     Server(9999).start()
+def QuickServer():
+    """Quickstarts a server."""
+    Server(9999).start()
 
-# def saveHistory():
-#     """Saves history with Tkinter's asksaveasfilename dialog."""
-#     global main_body_text
-#     file_name = asksaveasfilename(
-#         title="Choose save location",
-#         filetypes=[('Plain text', '*.txt'), ('Any File', '*.*')])
-#     try:
-#         filehandle = open(file_name + ".txt", "w")
-#     except IOError:
-#         print("Can't save history.")
-#         return
-#     contents = main_body_text.get(1.0, END)
-#     for line in contents:
-#         filehandle.write(line)
-#     filehandle.close()
+def saveHistory():
+    """Saves history with Tkinter's asksaveasfilename dialog."""
+    global main_body_text
+    file_name = asksaveasfilename(
+        title="Choose save location",
+        filetypes=[('Plain text', '*.txt'), ('Any File', '*.*')])
+    try:
+        filehandle = open(file_name + ".txt", "w")
+    except IOError:
+        print("Can't save history.")
+        return
+    contents = main_body_text.get(1.0, END)
+    for line in contents:
+        filehandle.write(line)
+    filehandle.close()
 
 
 def connects(clientType):
@@ -779,26 +779,26 @@ else:
     menubar = Menu(root)
 
     file_menu = Menu(menubar, tearoff=0)
-    # file_menu.add_command(label="Save chat", command=lambda: saveHistory())
-    menubar.add_command(label="Exit", command=lambda: root.destroy())
-    # menubar.add_cascade(label="File", menu=file_menu)
-    menubar.add_command(label="Change username",
+    file_menu.add_command(label="Save chat", command=lambda: saveHistory())
+    file_menu.add_command(label="Change username",
                           command=lambda: username_options_window(root))
+    file_menu.add_command(label="Exit", command=lambda: root.destroy())
+    menubar.add_cascade(label="File", menu=file_menu)
 
-    # connection_menu = Menu(menubar, tearoff=0)
-    # # connection_menu.add_command(label="Quick Connect", command=QuickClient)
-    # connection_menu.add_command(
-    #     label="Connect on port", command=lambda: client_options_window(root))
-    # connection_menu.add_command(
-    #     label="Disconnect", command=lambda: processFlag("-001"))
-    # menubar.add_cascade(label="Connect", menu=connection_menu)
+    connection_menu = Menu(menubar, tearoff=0)
+    connection_menu.add_command(label="Quick Connect", command=QuickClient)
+    connection_menu.add_command(
+        label="Connect on port", command=lambda: client_options_window(root))
+    connection_menu.add_command(
+        label="Disconnect", command=lambda: processFlag("-001"))
+    menubar.add_cascade(label="Connect", menu=connection_menu)
 
     server_menu = Menu(menubar, tearoff=0)
-    # server_menu.add_command(label="Launch server", command=QuickServer)
-    # server_menu.add_command(label="Listen on port",
-    #                         command=lambda: server_options_window(root))
-    # menubar.add_cascade(label="Server", menu=server_menu)
-    #
+    server_menu.add_command(label="Launch server", command=QuickServer)
+    server_menu.add_command(label="Listen on port",
+                            command=lambda: server_options_window(root))
+    menubar.add_cascade(label="Server", menu=server_menu)
+
     # menubar.add_command(label="Contacts", command=lambda:
     #                     contacts_window(root))
 
@@ -833,10 +833,10 @@ else:
                        command=lambda: connects(clientType))
     connecter.pack()
 
-    load_contacts()
+    # load_contacts()
 
 #------------------------------------------------------------#
 
     root.mainloop()
 
-    dump_contacts()
+    # dump_contacts()
