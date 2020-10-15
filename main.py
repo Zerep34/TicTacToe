@@ -34,37 +34,6 @@ port = "3300"
 top = ""
 
 main_body_text = 0
-#-GLOBALS-
-
-# So,
-   #  x_encode your message with the key, then pass that to
-   #  refract to get a string out of it.
-   # To decrypt, pass the message back to x_encode, and then back to refract
-
-def binWord(word):
-    """Converts the string into binary."""
-    master = ""
-    for letter in word:
-        temp = bin(ord(letter))[2:]
-        while len(temp) < 7:
-            temp = '0' + temp
-        master = master + temp
-    return master
-
-def xcrypt(message, key):
-    """Encrypts the binary message by the binary key."""
-    count = 0
-    master = ""
-    for letter in message:
-        if count == len(key):
-            count = 0
-        master += str(int(letter) ^ int(key[count]))
-        count += 1
-    return master
-
-def x_encode(string, number):
-    """Encrypts the string by the number."""
-    return xcrypt(binWord(string), bin(number)[2:])
 
 def refract(binary):
     """Returns the string representation of the binary.
@@ -86,22 +55,21 @@ def formatNumber(number):
     return temp
 
 def netThrow(conn, secret, message):
-    """Sends message through the open socket conn with the encryption key
-    secret. Sends the length of the incoming message, then sends the actual
+    """Sends message through the open socket conn. Sends the length of the incoming message, then sends the actual
     message.
     """
     try:
-        conn.send(formatNumber(len(x_encode(message, secret))).encode())
-        conn.send(x_encode(message, secret).encode())
+        conn.send(formatNumber(len(message)).encode())
+        conn.send(message.encode())
     except socket.error:
         if len(conn_array) != 0:
             writeToScreen(
                 "Connection issue. Sending message failed.", "System")
             processFlag("-001")
 
-def netCatch(conn, secret):
-    """Receive and return the message through open socket conn, decrypting
-    using key secret. If the message length begins with - instead of a number,
+def netCatch(conn):
+    """Receive and return the message through open socket conn.
+     If the message length begins with - instead of a number,
     process as a flag and return 1.
     """
     try:
@@ -110,7 +78,7 @@ def netCatch(conn, secret):
             processFlag(data.decode(), conn)
             return 1
         data = conn.recv(int(data.decode()))
-        return refract(xcrypt(data.decode(), bin(secret)[2:]))
+        return refract(data.decode())
     except socket.error:
         if len(conn_array) != 0:
             writeToScreen(
@@ -233,8 +201,6 @@ def passFriends(conn):
             conn.send(
                 formatNumber(len(connection.getpeername()[0])).encode())  # pass the ip address
             conn.send(connection.getpeername()[0].encode())
-            # conn.send(formatNumber(len(connection.getpeername()[1])).encode()) #pass the port number
-            # conn.send(connection.getpeername()[1].encode())
 
 #--------------------------------------------------------------------------
 
@@ -371,115 +337,6 @@ def optionDelete(window):
     connecter.config(state=NORMAL)
     window.destroy()
 
-#-----------------------------------------------------------------------------
-# Contacts window
-
-# def contacts_window(master):
-#     """Displays the contacts window, allowing the user to select a recent
-#     connection to reuse.
-#     """
-#     global contact_array
-#     cWindow = Toplevel(master)
-#     cWindow.title("Contacts")
-#     cWindow.grab_set()
-#     scrollbar = Scrollbar(cWindow, orient=VERTICAL)
-#     listbox = Listbox(cWindow, yscrollcommand=scrollbar.set)
-#     scrollbar.config(command=listbox.yview)
-#     scrollbar.pack(side=RIGHT, fill=Y)
-#     buttons = Frame(cWindow)
-#     cBut = Button(buttons, text="Connect",
-#                   command=lambda: contacts_connect(
-#                                       listbox.get(ACTIVE).split(" ")))
-#     cBut.pack(side=LEFT)
-#     dBut = Button(buttons, text="Remove",
-#                   command=lambda: contacts_remove(
-#                                       listbox.get(ACTIVE).split(" "), listbox))
-#     dBut.pack(side=LEFT)
-#     aBut = Button(buttons, text="Add",
-#                   command=lambda: contacts_add(listbox, cWindow))
-#     aBut.pack(side=LEFT)
-#     buttons.pack(side=BOTTOM)
-
-#     for person in contact_array:
-#         listbox.insert(END, contact_array[person][1] + " " +
-#                        person + " " + contact_array[person][0])
-#     listbox.pack(side=LEFT, fill=BOTH, expand=1)
-
-# def contacts_connect(item):
-#     """Establish a connection between two contacts."""
-#     Client(item[1], int(item[2])).start()
-
-# def contacts_remove(item, listbox):
-#     """Remove a contact."""
-#     if listbox.size() != 0:
-#         listbox.delete(ACTIVE)
-#         global contact_array
-#         h = contact_array.pop(item[1])
-
-
-# def contacts_add(listbox, master):
-#     """Add a contact."""
-#     aWindow = Toplevel(master)
-#     aWindow.title("Contact add")
-#     Label(aWindow, text="Username:").grid(row=0)
-#     name = Entry(aWindow)
-#     name.focus_set()
-#     name.grid(row=0, column=1)
-#     Label(aWindow, text="IP:").grid(row=1)
-#     ip = Entry(aWindow)
-#     ip.grid(row=1, column=1)
-#     Label(aWindow, text="Port:").grid(row=2)
-#     port = Entry(aWindow)
-#     port.grid(row=2, column=1)
-#     go = Button(aWindow, text="Add", command=lambda:
-#                 contacts_add_helper(name.get(), ip.get(), port.get(),
-#                                     aWindow, listbox))
-#     go.grid(row=3, column=1)
-
-
-# def contacts_add_helper(username, ip, port, window, listbox):
-#     """Contact adding helper function. Recognizes invalid usernames and
-#     adds contact to listbox and contact_array.
-#     """
-#     for letter in username:
-#         if letter == " " or letter == "\n":
-#             error_window(root, "Invalid username. No spaces allowed.")
-#             return
-#     if options_sanitation(port, ip):
-#         listbox.insert(END, username + " " + ip + " " + port)
-#         contact_array[ip] = [port, username]
-#         window.destroy()
-#         return
-
-# def load_contacts():
-#     """Loads the recent chats out of the persistent file contacts.dat."""
-#     global contact_array
-#     try:
-#         filehandle = open("data\\contacts.dat", "r")
-#     except IOError:
-#         return
-#     line = filehandle.readline()
-#     while len(line) != 0:
-#         temp = (line.rstrip('\n')).split(" ")  # format: ip, port, name
-#         contact_array[temp[0]] = temp[1:]
-#         line = filehandle.readline()
-#     filehandle.close()
-
-# def dump_contacts():
-#     """Saves the recent chats to the persistent file contacts.dat."""
-#     global contact_array
-#     try:
-#         filehandle = open("data\\contacts.dat", "w")
-#     except IOError:
-#         print("Can't dump contacts.")
-#         return
-#     for contact in contact_array:
-#         filehandle.write(
-#             contact + " " + str(contact_array[contact][0]) + " " +
-#             contact_array[contact][1] + "\n")
-#     filehandle.close()
-
-#-----------------------------------------------------------------------------
 
 # places the text from the text bar on to the screen and sends it to
 # everyone this program is connected to
@@ -581,22 +438,22 @@ class Server (threading.Thread):
         statusConnect.set("Disconnect")
         connecter.config(state=NORMAL)
 
-        # create the numbers for my encryption
-        prime = random.randint(1000, 9000)
-        while not isPrime(prime):
-            prime = random.randint(1000, 9000)
-        base = random.randint(20, 100)
-        a = random.randint(20, 100)
-
-        # send the numbers (base, prime, A)
-        conn.send(formatNumber(len(str(base))).encode())
-        conn.send(str(base).encode())
-
-        conn.send(formatNumber(len(str(prime))).encode())
-        conn.send(str(prime).encode())
-
-        conn.send(formatNumber(len(str(pow(base, a) % prime))).encode())
-        conn.send(str(pow(base, a) % prime).encode())
+        # # create the numbers for my encryption
+        # prime = random.randint(1000, 9000)
+        # while not isPrime(prime):
+        #     prime = random.randint(1000, 9000)
+        # base = random.randint(20, 100)
+        # a = random.randint(20, 100)
+        #
+        # # send the numbers (base, prime, A)
+        # conn.send(formatNumber(len(str(base))).encode())
+        # conn.send(str(base).encode())
+        #
+        # conn.send(formatNumber(len(str(prime))).encode())
+        # conn.send(str(prime).encode())
+        #
+        # conn.send(formatNumber(len(str(pow(base, a) % prime))).encode())
+        # conn.send(str(pow(base, a) % prime).encode())
 
         # get B
         data = conn.recv(4)
@@ -604,10 +461,10 @@ class Server (threading.Thread):
         b = int(data.decode())
 
         # calculate the encryption key
-        global secret_array
-        secret = pow(b, a) % prime
-        # store the encryption key by the connection
-        secret_array[conn] = secret
+        # global secret_array
+        # secret = pow(b, a) % prime
+        # # store the encryption key by the connection
+        # secret_array[conn] = secret
 
         conn.send(formatNumber(len(username)).encode())
         conn.send(username.encode())
@@ -622,7 +479,7 @@ class Server (threading.Thread):
             contact_array[str(addr[0])] = [str(self.port), "No_nick"]
 
         passFriends(conn)
-        threading.Thread(target=Runner, args=(conn, secret)).start()
+        threading.Thread(target=Runner, args=(conn, 0)).start()
         Server(self.port).start()
 
 
@@ -675,10 +532,10 @@ class Client (threading.Thread):
         a = int(data.decode())
         b = random.randint(20, 100)
         # send the B value
-        conn.send(formatNumber(len(str(pow(base, b) % prime))).encode())
+        conn.send(formatNumber(len(base)).encode())
         conn.send(str(pow(base, b) % prime).encode())
-        secret = pow(a, b) % prime
-        secret_array[conn] = secret
+        # secret = pow(a, b) % prime
+        # secret_array[conn] = secret
 
         conn.send(formatNumber(len(username)).encode())
         conn.send(username.encode())
@@ -692,54 +549,14 @@ class Client (threading.Thread):
         else:
             username_array[conn] = self.host
             contact_array[conn.getpeername()[0]] = [str(self.port), "No_nick"]
-        threading.Thread(target=Runner, args=(conn, secret)).start()
-        # Server(self.port).start()
-        # ##########################################################################THIS
-        # IS GOOD, BUT I CAN'T TEST ON ONE MACHINE
+        threading.Thread(target=Runner, args=(conn, 0)).start()
 
-def Runner(conn, secret):
+def Runner(conn):
     global username_array
     while 1:
-        data = netCatch(conn, secret)
+        data = netCatch(conn)
         if data != 1:
             writeToScreen(data, username_array[conn])
-
-#-------------------------------------------------------------------------
-# Menu helpers
-
-# def QuickClient():
-#     """Menu window for connection options."""
-#     window = Toplevel(root)
-#     window.title("Connection options")
-#     window.grab_set()
-#     Label(window, text="Server IP:").grid(row=0)
-#     destination = Entry(window)
-#     destination.grid(row=0, column=1)
-#     go = Button(window, text="Connect", command=lambda:
-#                 client_options_go(destination.get(), "9999", window))
-#     go.grid(row=1, column=1)
-
-
-# def QuickServer():
-#     """Quickstarts a server."""
-#     Server(9999).start()
-
-# def saveHistory():
-#     """Saves history with Tkinter's asksaveasfilename dialog."""
-#     global main_body_text
-#     file_name = asksaveasfilename(
-#         title="Choose save location",
-#         filetypes=[('Plain text', '*.txt'), ('Any File', '*.*')])
-#     try:
-#         filehandle = open(file_name + ".txt", "w")
-#     except IOError:
-#         print("Can't save history.")
-#         return
-#     contents = main_body_text.get(1.0, END)
-#     for line in contents:
-#         filehandle.write(line)
-#     filehandle.close()
-
 
 def connects(clientType):
     global conn_array
@@ -779,28 +596,9 @@ else:
     menubar = Menu(root)
 
     file_menu = Menu(menubar, tearoff=0)
-    file_menu.add_command(label="Save chat", command=lambda: saveHistory())
     menubar.add_command(label="Change username",
                           command=lambda: username_options_window(root))
     menubar.add_command(label="Exit", command=lambda: root.destroy())
-    # menubar.add_cascade(label="File", menu=file_menu)
-
-    # connection_menu = Menu(menubar, tearoff=0)
-    # connection_menu.add_command(label="Quick Connect", command=QuickClient)
-    # connection_menu.add_command(
-    #     label="Connect on port", command=lambda: client_options_window(root))
-    # connection_menu.add_command(
-    #     label="Disconnect", command=lambda: processFlag("-001"))
-    # menubar.add_cascade(label="Connect", menu=connection_menu)
-
-    # server_menu = Menu(menubar, tearoff=0)
-    # server_menu.add_command(label="Launch server", command=QuickServer)
-    # server_menu.add_command(label="Listen on port",
-    #                         command=lambda: server_options_window(root))
-    # menubar.add_cascade(label="Server", menu=server_menu)
-
-    # menubar.add_command(label="Contacts", command=lambda:
-    #                     contacts_window(root))
 
     root.config(menu=menubar)
 
@@ -833,10 +631,4 @@ else:
                        command=lambda: connects(clientType))
     connecter.pack()
 
-    # load_contacts()
-
-#------------------------------------------------------------#
-
     root.mainloop()
-
-    # dump_contacts()
