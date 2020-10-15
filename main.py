@@ -1,10 +1,8 @@
-import sys
-
 from tkinter import *
 import threading
 import socket
 
-connectionList = [] # Store sockets
+connectionList = []  # Store sockets
 usernameList = dict()  # Store Username 
 contact_array = dict()  # Store IP and Port for open connections
 
@@ -65,10 +63,6 @@ Process the header corresponding to number, using open socket conn
 if necessary.
 """
 def headerCheck(number, conn=None):
-    global statusConnect
-    global connectionList
-    global usernameList
-    global contact_array
     t = int(number[1:])
     if t == 1:  # disconnect
         # in the event of single connection being left or if we're just a
@@ -81,7 +75,7 @@ def headerCheck(number, conn=None):
             except socket.error:
                 print("Issue with someone being bad about disconnecting")
             statusConnect.set("Connect")
-            connecter.config(state=NORMAL)
+            connectionButton.config(state=NORMAL)
             return
 
         if conn != None:
@@ -233,7 +227,6 @@ def checkIpStructure(ipArray):
 """
 Display server side options panel
 """
-
 def optionsWindowServerSide(master):
     top = Toplevel(master)
     top.title("Connection options")
@@ -256,6 +249,7 @@ def processServerOptions(port, window):
     if checkOptionsStructure(port):
         window.destroy()
         Server(int(port)).start()
+
 
 """
 Display username options window
@@ -285,7 +279,6 @@ def processUsernameOptions(name, window):
 Display error window
 """
 def ExceptionWindow(master, texty):
-
     window = Toplevel(master)
     window.title("ERROR")
     window.grab_set()
@@ -299,7 +292,7 @@ def ExceptionWindow(master, texty):
 Delete all options
 """
 def optionDelete(window):
-    connecter.config(state=NORMAL)
+    connectionButton.config(state=NORMAL)
     window.destroy()
 
 
@@ -375,7 +368,7 @@ class Server(threading.Thread):
 
         global statusConnect
         statusConnect.set("Disconnect")
-        connecter.config(state=NORMAL)
+        connectionButton.config(state=NORMAL)
 
         conn.send(checkNumberStructure(len(username)).encode())
         conn.send(username.encode())
@@ -412,12 +405,12 @@ class Client(threading.Thread):
             conn_init.connect((self.host, self.port))
         except socket.timeout:
             writeToScreen("Timeout issue. Host possible not there.", "System")
-            connecter.config(state=NORMAL)
+            connectionButton.config(state=NORMAL)
             raise SystemExit(0)
         except socket.error:
             writeToScreen(
                 "Connection issue. Host actively refused connection.", "System")
-            connecter.config(state=NORMAL)
+            connectionButton.config(state=NORMAL)
             raise SystemExit(0)
         porta = conn_init.recv(5)
         porte = int(porta.decode())
@@ -430,7 +423,7 @@ class Client(threading.Thread):
 
         global statusConnect
         statusConnect.set("Disconnect")
-        connecter.config(state=NORMAL)
+        connectionButton.config(state=NORMAL)
 
         connectionList.append(conn)
 
@@ -466,7 +459,7 @@ Or send First exchange between server and his client
 """
 def connection(clientType):
     global connectionList
-    connecter.config(state=DISABLED)
+    connectionButton.config(state=DISABLED)
     if len(connectionList) == 0:
         if clientType == 0:
             optionsWindowClientSide(root)
@@ -489,7 +482,7 @@ def ServerRadioButton():
 
 
 root = Tk()
-root.title("Chat")
+root.title("Tic Tac Toe")
 
 menubar = Menu(root)
 
@@ -501,9 +494,6 @@ menubar.add_command(label="Exit", command=lambda: root.destroy())
 root.config(menu=menubar)
 
 main_body = Frame(root, height=20, width=50)
-
-value = StringVar()
-value.set("texte par défaut")
 
 main_body
 mainTextArea = Text(main_body)
@@ -527,10 +517,12 @@ statusConnect.set("Connect")
 clientType = 1
 Radiobutton(root, text="Client", variable=clientType,
             value=0, command=ClientRadioButton).pack(anchor=E)
+
 Radiobutton(root, text="Server", variable=clientType,
             value=1, command=ServerRadioButton).pack(anchor=E)
-connecter = Button(root, textvariable=statusConnect,
+
+connectionButton = Button(root, textvariable=statusConnect,
                    command=lambda: connection(clientType))
-connecter.pack()
+connectionButton.pack()
 
 root.mainloop()
