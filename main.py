@@ -18,6 +18,7 @@ top = ""
 
 main_body_text = 0
 
+
 def formatNumber(number):
     """Ensures that number is at least length 4 by
     adding extra 0s to the front.
@@ -60,6 +61,7 @@ def netCatch(conn):
             writeToScreen(
                 "Connection issue. Receiving message failed.", "System")
         processFlag("-001")
+
 
 def processFlag(number, conn=None):
     """Process the flag corresponding to number, using open socket conn
@@ -161,11 +163,7 @@ def passFriends(conn):
             conn.send(
                 formatNumber(len(connection.getpeername()[0])).encode())  # pass the ip address
             conn.send(connection.getpeername()[0].encode())
-            # conn.send(formatNumber(len(connection.getpeername()[1])).encode()) #pass the port number
-            # conn.send(connection.getpeername()[1].encode())
 
-
-# --------------------------------------------------------------------------
 
 def client_options_window(master):
     """Launches client options window for getting destination hostname
@@ -225,8 +223,6 @@ def ip_process(ipArray):
     return True
 
 
-# ------------------------------------------------------------------------------
-
 def server_options_window(master):
     """Launches server options window for getting port."""
     top = Toplevel(master)
@@ -251,8 +247,6 @@ def server_options_go(port, window):
         Server(int(port)).start()
 
 
-# -------------------------------------------------------------------------
-
 def username_options_window(master):
     """Launches username options window for setting username."""
     top = Toplevel(master)
@@ -274,8 +268,6 @@ def username_options_go(name, window):
     processUserCommands("nick", [name])
     window.destroy()
 
-
-# -------------------------------------------------------------------------
 
 def error_window(master, texty):
     """Launches a new window to display the message texty."""
@@ -347,8 +339,6 @@ def processUserInput(text):
         params = text[text.find(" ") + 1:].split(" ")
         processUserCommands(command, params)
 
-
-# -------------------------------------------------------------------------
 
 class Server(threading.Thread):
     "A class for a Server instance."""
@@ -493,52 +483,45 @@ def toTwo():
     clientType = 1
 
 
-# -------------------------------------------------------------------------
+root = Tk()
+root.title("Chat")
 
+menubar = Menu(root)
 
-if len(sys.argv) > 1 and sys.argv[1] == "-cli":
-    print("Starting command line chat")
+file_menu = Menu(menubar, tearoff=0)
+menubar.add_command(label="Change username",
+                    command=lambda: username_options_window(root))
+menubar.add_command(label="Exit", command=lambda: root.destroy())
 
-else:
-    root = Tk()
-    root.title("Chat")
+root.config(menu=menubar)
 
-    menubar = Menu(root)
+main_body = Frame(root, height=20, width=50)
 
-    file_menu = Menu(menubar, tearoff=0)
-    menubar.add_command(label="Change username",
-                        command=lambda: username_options_window(root))
-    menubar.add_command(label="Exit", command=lambda: root.destroy())
+main_body_text = Text(main_body)
+body_text_scroll = Scrollbar(main_body)
+main_body_text.focus_set()
+body_text_scroll.pack(side=RIGHT, fill=Y)
+main_body_text.pack(side=LEFT, fill=Y)
+body_text_scroll.config(command=main_body_text.yview)
+main_body_text.config(yscrollcommand=body_text_scroll.set)
+main_body.pack()
 
-    root.config(menu=menubar)
+main_body_text.insert(END, "Welcome to the chat program!")
+main_body_text.config(state=DISABLED)
 
-    main_body = Frame(root, height=20, width=50)
+text_input = Entry(root, width=60)
+text_input.bind("<Return>", processUserText)
+text_input.pack()
 
-    main_body_text = Text(main_body)
-    body_text_scroll = Scrollbar(main_body)
-    main_body_text.focus_set()
-    body_text_scroll.pack(side=RIGHT, fill=Y)
-    main_body_text.pack(side=LEFT, fill=Y)
-    body_text_scroll.config(command=main_body_text.yview)
-    main_body_text.config(yscrollcommand=body_text_scroll.set)
-    main_body.pack()
+statusConnect = StringVar()
+statusConnect.set("Connect")
+clientType = 1
+Radiobutton(root, text="Client", variable=clientType,
+            value=0, command=toOne).pack(anchor=E)
+Radiobutton(root, text="Server", variable=clientType,
+            value=1, command=toTwo).pack(anchor=E)
+connecter = Button(root, textvariable=statusConnect,
+                   command=lambda: connects(clientType))
+connecter.pack()
 
-    main_body_text.insert(END, "Welcome to the chat program!")
-    main_body_text.config(state=DISABLED)
-
-    text_input = Entry(root, width=60)
-    text_input.bind("<Return>", processUserText)
-    text_input.pack()
-
-    statusConnect = StringVar()
-    statusConnect.set("Connect")
-    clientType = 1
-    Radiobutton(root, text="Client", variable=clientType,
-                value=0, command=toOne).pack(anchor=E)
-    Radiobutton(root, text="Server", variable=clientType,
-                value=1, command=toTwo).pack(anchor=E)
-    connecter = Button(root, textvariable=statusConnect,
-                       command=lambda: connects(clientType))
-    connecter.pack()
-
-    root.mainloop()
+root.mainloop()
