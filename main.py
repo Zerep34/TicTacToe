@@ -14,6 +14,8 @@ top = ""
 
 mainTextArea = 0
 
+PLAYER_TYPE = ""
+
 """
 Verify that at least the lenght of each number is 4 long.
 Otherwise add 0
@@ -314,6 +316,15 @@ def placeText(text):
     for person in connectionList:
         socketSend(person, text)
 
+"""
+Send TicTacToe data to be display on other screen
+"""
+def sendTicTacToeData(text):
+    global connectionList
+    global username
+    for person in connectionList:
+        socketSend(person, text)
+
 
 """
 Structure the response like this 'username : text'
@@ -334,6 +345,8 @@ Accept Text from the input aread and then delete it
 """
 def processUserText(event):
     data = text_input.get()
+    if "--C:" in data:
+
     placeText(data)
     text_input.delete(0, END)
 
@@ -348,6 +361,8 @@ class Server(threading.Thread):
 
     def run(self):
         global connectionList
+        global PLAYER_TYPE
+        PLAYER_TYPE = "X"
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.bind(('', self.port))
 
@@ -406,6 +421,8 @@ class Client(threading.Thread):
 
     def run(self):
         global connectionList
+        global PLAYER_TYPE
+        PLAYER_TYPE = "O"
         conn_init = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         conn_init.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         conn_init.settimeout(5.0)
@@ -458,7 +475,14 @@ def exchange(conn):
     while 1:
         data = socketReceive(conn)
         if data != 1:
-            writeToScreen(data, usernameList[conn])
+            if "--C:" in data :
+                coord = data[4:].split(':')
+                if PLAYER_TYPE == "X":
+                    draw_X((int) coord[0], (int) coord[1])
+                else:
+                    draw_Y((int) coord[0], (int) coord[1])
+            else :
+                writeToScreen(data, usernameList[conn])
 
 
 """
@@ -511,6 +535,7 @@ body_text_scroll.pack(side=RIGHT, fill=Y)
 mainTextArea.pack(side=LEFT, fill=Y)
 body_text_scroll.config(command=mainTextArea.yview)
 mainTextArea.config(yscrollcommand=body_text_scroll.set)
+
 main_body.pack()
 
 mainTextArea.insert(END, "Welcome to the chat program!")
