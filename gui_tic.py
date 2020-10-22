@@ -172,7 +172,6 @@ class Game(Tk):
         Handles most of the game logic
         I probably should move it elswhere but it's pretty short
         """
-        
         x = self.ptgrid(event.x)
         y = self.ptgrid(event.y)
         

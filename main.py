@@ -510,7 +510,7 @@ class Server(threading.Thread):
         self.port = port
 
     def run(self):
-        self.p2pgame.PLAYER_TYPE = "X"
+        self.p2pgame.PLAYER_TYPE = 1
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.bind(('', self.port))
 
@@ -570,7 +570,7 @@ class Client(threading.Thread):
         self.host = host
 
     def run(self):
-        self.p2pGame.PLAYER_TYPE = "O"
+        self.p2pGame.PLAYER_TYPE = 2
         conn_init = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         conn_init.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         conn_init.settimeout(5.0)
