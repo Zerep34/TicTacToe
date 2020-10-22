@@ -351,9 +351,8 @@ class P2pGame:
         # top = Toplevel(master)
         # top.title("Tic Tac Toe")
         # top.grab_set()
-        global TicGame
-        TicGame = Game(root, self)
-        TicGame.mainloop()
+        self.TicGame = Game(root, self)
+        self.TicGame.mainloop()
 
 
     """
