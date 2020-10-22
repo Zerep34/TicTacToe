@@ -208,7 +208,7 @@ class P2pGame:
     def AvailableUsername(self, name):
 
         for conn in self.usernameList:
-            if name == self.usernameList[conn] or name == username:
+            if name == self.usernameList[conn] or name == self.username:
                 return False
         return True
 
