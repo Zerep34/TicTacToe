@@ -1,4 +1,5 @@
 from tkinter import *
+from gui_tic import Game
 import threading
 import socket
 
@@ -267,6 +268,13 @@ def usernameWindowSetUp(master):
     go.grid(row=1, column=1)
 
 
+def launchTicTacToe(root):
+    # top = Toplevel(master)
+    # top.title("Tic Tac Toe")
+    # top.grab_set()
+    gameTic = Game(root)
+    gameTic.mainloop()
+
 """
 Processes server options window.
 """
@@ -487,9 +495,9 @@ root.title("Tic Tac Toe")
 menubar = Menu(root)
 
 file_menu = Menu(menubar, tearoff=0)
-menubar.add_command(label="Change username",
-                    command=lambda: usernameWindowSetUp(root))
+menubar.add_command(label="Change username", command=lambda: usernameWindowSetUp(root))
 menubar.add_command(label="Exit", command=lambda: root.destroy())
+menubar.add_command(label="TicTacToe", command=lambda: launchTicTacToe(root))
 
 root.config(menu=menubar)
 

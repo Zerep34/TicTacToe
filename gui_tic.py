@@ -2,7 +2,7 @@ from tkinter import *
 import sys
 # PARAMETERS
 # graphics
-WINDOW_SIZE = 600 # pixels
+WINDOW_SIZE = 400 # pixels
 GRID_LINE_WIDTH = 2 # pixels
 SYMBOL_WIDTH = WINDOW_SIZE/12 # pixels - adjust ratio
 
@@ -40,14 +40,14 @@ class Game(Tk):
     """
     Main class
     """
-    def __init__(self):
-        Tk.__init__(self)
+    def __init__(self, tk):
+        self.tk = tk
+        # Tk.__init__(self)
         self.canvas = Canvas(
             height=WINDOW_SIZE, width=WINDOW_SIZE,
             bg=BG_COLOR)
 
         self.canvas.pack()
-
         self.bind('<x>', self.exit)
         self.canvas.bind('<Button-1>', self.click)
 
@@ -60,7 +60,7 @@ class Game(Tk):
             [EMPTY, EMPTY, EMPTY]]
         self.new_board()
         self.gamestate = FIRST_PLAYER
-        self.launch()
+        # self.launch()
 
 
     def title_screen(self):
@@ -156,44 +156,44 @@ class Game(Tk):
                 text='[click to play again]', fill='white',
                 font=('Franklin Gothic', int(-WINDOW_SIZE/25)))
 
-    def launch(self):
+    # def launch(self):
         
-        loc = [-1,-1]
-        while(loc[0] < 0 or loc[0] > 2 or loc[1] < 0 or loc[1] > 2 ):
-            print("-> new : restart the game\n -> end : stop the game \n ->  Case [x,y] : input")
-            mess = input() 
-            if(mess == "new"):
-                self.new_board()
-                self.gamestate = FIRST_PLAYER
-            elif(mess == "end"):
-                print("quit")
-                sys.exit()
-            else:
-                try:
-                    print("Case X 0<=X<=2 : ")
-                    x = int(mess)
-                    print("Case Y 0<=Y<=2: ")
-                    mess = input()
-                    y = int(mess)
-                    loc = [x,y]
-                    print(loc)
-                except:
-                    print("Veuillez fournir un entier ! ")
-                    pass
-        self.click(loc)
-    def click(self, loc):
+    #     loc = [-1,-1]
+    #     while(loc[0] < 0 or loc[0] > 2 or loc[1] < 0 or loc[1] > 2 ):
+    #         print("-> new : restart the game\n -> end : stop the game \n ->  Case [x,y] : input")
+    #         mess = input() 
+    #         if(mess == "new"):
+    #             self.new_board()
+    #             self.gamestate = FIRST_PLAYER
+    #         elif(mess == "end"):
+    #             print("quit")
+    #             sys.exit()
+    #         else:
+    #             try:
+    #                 print("Case X 0<=X<=2 : ")
+    #                 x = int(mess)
+    #                 print("Case Y 0<=Y<=2: ")
+    #                 mess = input()
+    #                 y = int(mess)
+    #                 loc = [x,y]
+    #                 print(loc)
+    #             except:
+    #                 print("Veuillez fournir un entier ! ")
+    #                 pass
+    #     self.click(loc)
+    def click(self, event):
         """
         Handles most of the game logic
         I probably should move it elswhere but it's pretty short
         """
 
-        # x = self.ptgrid(event.x)
-        # print(x)
-        # y = self.ptgrid(event.y)
-        # print(y)
+        x = self.ptgrid(event.x)
+        print(x)
+        y = self.ptgrid(event.y)
+        print(y)
 
-        x = loc[0]
-        y = loc[1]
+        # x = loc[0]
+        # y = loc[1]
 
         # if self.gamestate == STATE_TITLE_SCREEN:
             # self.new_board()
@@ -342,8 +342,8 @@ class Game(Tk):
     def exit(self, event):
         self.destroy()
 
-def main():
-    root = Game()
-    root.mainloop()
+# def main():
+#     root = Game()
+#     root.mainloop()
 
-main()
+# main()
