@@ -172,8 +172,6 @@ class P2pGame:
 
 
     def optionCommands(self, command, param):
-        global connectionList
-        global username
         if command == "nick":  # change nickname
             for letter in param[0]:
                 if letter == " " or letter == "\n":
@@ -184,7 +182,7 @@ class P2pGame:
                 for conn in self.connectionList:
                     conn.send("-002".encode())
                     self.socketSend(conn, param[0])
-                username = param[0]
+                self.username = param[0]
             else:
                 self.writeToScreen(param[0] +
                             " is already taken as a username", "System")
@@ -351,7 +349,7 @@ class P2pGame:
         # top = Toplevel(master)
         # top.title("Tic Tac Toe")
         # top.grab_set()
-        self.TicGame = Game(root, self)
+        self.TicGame = Game(root, self, Player=self.PLAYER_TYPE)
         self.TicGame.mainloop()
 
 
@@ -462,11 +460,11 @@ class P2pGame:
                 elif("--X:" in data):
                     x = int(data[4:].split(":")[0])
                     y = int(data[4:].split(":")[1])
-                    self.TicGame.new_move(self.TicGame.X, x, y)
+                    self.TicGame.new_move(x, y)
                 elif("--O:" in data):
                     x = int(data[4:].split(":")[0])
                     y = int(data[4:].split(":")[1])
-                    self.TicGame.new_move(self.TicGame.O, x, y)
+                    self.TicGame.new_move(x, y)
                 else:
                     self.writeToScreen(data, self.usernameList[conn])
 
@@ -512,7 +510,7 @@ class Server(threading.Thread):
         self.port = port
 
     def run(self):
-        self.p2pgamePLAYER_TYPE = "X"
+        self.p2pgame.PLAYER_TYPE = "X"
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.bind(('', self.port))
 

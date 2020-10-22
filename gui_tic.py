@@ -5,7 +5,7 @@ class Game(Tk):
     """
     Main class
     """
-    def __init__(self, tk, P2pGame):
+    def __init__(self, tk, P2pGame, Player):
         self.p2pGame = P2pGame
         self.GRID_LINE_WIDTH = 2 # pixels
         self.WINDOW_SIZE = 400 # pixels*
@@ -23,6 +23,7 @@ class Game(Tk):
         self.STATE_O_TURN = 2
         self.STATE_GAME_OVER = 3
         self.EMPTY = 0
+        self.player = Player
         self.X = 1
         self.O = 2
         self.SYMBOL_WIDTH = self.WINDOW_SIZE/12 # pixels - adjust ratio
@@ -185,7 +186,7 @@ class Game(Tk):
 
         #duplication /!\
         if (self.gamestate == self.STATE_X_TURN and self.board[y][x] == self.EMPTY):
-            self.new_move(self.X, x, y)
+            self.new_move(x, y)
 
             if self.has_won(self.X):
                 self.gamestate = self.STATE_GAME_OVER
@@ -207,7 +208,7 @@ class Game(Tk):
                 #self.launch()
 
         elif (self.gamestate == self.STATE_O_TURN and self.board[y][x] == self.EMPTY):
-            self.new_move(self.O, x, y)
+            self.new_move(x, y)
 
             if self.has_won(self.O):
                 self.gamestate = self.STATE_GAME_OVER
@@ -233,7 +234,7 @@ class Game(Tk):
             self.gamestate = self.FIRST_PLAYER
         
 
-    def new_move(self, player, grid_x, grid_y):
+    def new_move(self, grid_x, grid_y):
         """
         player is either X or O
         x and y are 0-based grid coordinates
@@ -245,11 +246,11 @@ class Game(Tk):
 
         """
         #duplication /!\
-        if player == self.X:
+        if self.player == self.X:
             self.draw_X(grid_x, grid_y)
             self.board[grid_y][grid_x] = self.X
 
-        elif player == self.O:
+        elif self.player == self.O:
             self.draw_O(grid_x, grid_y)
             self.board[grid_y][grid_x] = self.O
 
