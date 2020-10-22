@@ -217,7 +217,7 @@ class Game(Tk):
                 self.p2pGame.sendTicTacToeData(text=data)
 
             else:
-                data = "--X:" + x + ":" + y
+                data = "--X:" + str(x) + ":" + str(y)
                 self.p2pGame.sendTicTacToeData(text=data)
                 self.gamestate = STATE_O_TURN
                 #self.launch()
@@ -239,7 +239,7 @@ class Game(Tk):
 
             else:
                 self.gamestate = STATE_X_TURN
-                data = "--Y:" + x + ":" + y
+                data = "--Y:" + str(x) + ":" + str(y)
                 self.p2pGame.sendTicTacToeData(text=data)
                 #self.launch()
 
