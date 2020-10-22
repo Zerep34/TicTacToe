@@ -63,7 +63,7 @@ class P2pGame:
                     value=1, command=self.ServerRadioButton).pack(anchor=E)
 
         self.connectionButton = Button(self.root, textvariable=self.statusConnect,
-                                command=lambda: self.connection(clientType))
+                                command=lambda: self.connection(self.clientType))
         self.connectionButton.pack()
 
         self.root.mainloop()
@@ -352,7 +352,7 @@ class P2pGame:
         # top.title("Tic Tac Toe")
         # top.grab_set()
         global TicGame
-        TicGame = Game(root)
+        TicGame = Game(root, self)
         TicGame.mainloop()
 
 
