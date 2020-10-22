@@ -159,33 +159,56 @@ class Game(Tk):
 
         #duplication /!\
         if (self.board[y][x] == self.EMPTY):
-            self.new_move(x, y, self.player)
+            if(self.p2pGame.playerTurn == 'X' and self.player == 1):
+                self.new_move(x, y, self.player)
 
-            if self.has_won(self.player):
-                self.gamestate = self.STATE_GAME_OVER
-                if self.player == 1:
-                    self.gameover_screen('X WINS')
-                    data = "--W:X"
+                if self.has_won(self.player):
+                    self.gamestate = self.STATE_GAME_OVER
+                    if self.player == 1:
+                        self.gameover_screen('X WINS')
+                        data = "--W:X"
+                    else:
+                        self.gameover_screen('O WINS')
+                        data = "--W:O"
+                    self.p2pGame.sendTicTacToeData(text=data)
+
+
+                elif self.is_a_draw():
+                    self.gamestate = self.STATE_GAME_OVER
+                    self.gameover_screen('DRAW')
+                    data = "--D"
+                    self.p2pGame.sendTicTacToeData(text=data)
+
                 else:
-                    self.gameover_screen('O WINS')
-                    data = "--W:O"
-                self.p2pGame.sendTicTacToeData(text=data)
-
-
-            elif self.is_a_draw():
-                self.gamestate = self.STATE_GAME_OVER
-                self.gameover_screen('DRAW')
-                data = "--D"
-                self.p2pGame.sendTicTacToeData(text=data)
-
-            else:
-                if self.player == 1:
                     data = "--X:"+ str(x) + ":" + str(y)
+                    self.p2pGame.sendTicTacToeData(text=data)
+                    # self.gamestate = self.STATE_O_TURN
+                    #self.launch()
+            elif(self.p2pGame.playerTurn == 'O' and self.player == 2):
+                self.new_move(x, y, self.player)
+
+                if self.has_won(self.player):
+                    self.gamestate = self.STATE_GAME_OVER
+                    if self.player == 1:
+                        self.gameover_screen('X WINS')
+                        data = "--W:X"
+                    else:
+                        self.gameover_screen('O WINS')
+                        data = "--W:O"
+                    self.p2pGame.sendTicTacToeData(text=data)
+
+
+                elif self.is_a_draw():
+                    self.gamestate = self.STATE_GAME_OVER
+                    self.gameover_screen('DRAW')
+                    data = "--D"
+                    self.p2pGame.sendTicTacToeData(text=data)
+
                 else:
                     data = "--O:"+ str(x) + ":" + str(y)
-                self.p2pGame.sendTicTacToeData(text=data)
-                # self.gamestate = self.STATE_O_TURN
-                #self.launch()
+                    self.p2pGame.sendTicTacToeData(text=data)
+                    # self.gamestate = self.STATE_O_TURN
+                    #self.launch()
         elif self.gamestate == self.STATE_GAME_OVER:
             #reset
             self.new_board()

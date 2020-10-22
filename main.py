@@ -459,17 +459,13 @@ class P2pGame:
                     self.TicGame.gamestate = self.TicGame.STATE_GAME_OVER
                     self.TicGame.gameover_screen('X WINS')
                 elif("--X:" in data):
-                    if(self.playerTurn == 'X' and self.PLAYER_TYPE == 1):
-                        x = int(data[4:].split(":")[0])
-                        y = int(data[4:].split(":")[1])
-                        self.TicGame.new_move(x, y, 1)
-                        self.playerTurn = 'O'
+                    x = int(data[4:].split(":")[0])
+                    y = int(data[4:].split(":")[1])
+                    self.TicGame.new_move(x, y, 1)
                 elif("--O:" in data):
-                    if(self.playerTurn == 'O' and self.PLAYER_TYPE == 2):
-                        x = int(data[4:].split(":")[0])
-                        y = int(data[4:].split(":")[1])
-                        self.TicGame.new_move(x, y, 2)
-                        self.playerTurn = 'X'
+                    x = int(data[4:].split(":")[0])
+                    y = int(data[4:].split(":")[1])
+                    self.TicGame.new_move(x, y, 2)
                 else:
                     self.writeToScreen(data, self.usernameList[conn])
 
