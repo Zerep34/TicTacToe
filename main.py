@@ -492,13 +492,11 @@ class P2pGame:
 
 
     def ClientRadioButton(self ):
-        global clientType
-        clientType = 0
+        self.clientType = 0
 
 
     def ServerRadioButton(self ):
-        global clientType
-        clientType = 1
+        self.clientType = 1
 
 
 
