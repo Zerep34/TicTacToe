@@ -24,15 +24,15 @@ class P2pGame:
         self.root = Tk()
         self.root.title("Tic Tac Toe")
 
-        menubar = Menu(self.root)
+        self.menubar = Menu(self.root)
 
-        file_menu = Menu(menubar, tearoff=0)
-        menubar.add_command(label="Change username",
+        file_menu = Menu(self.menubar, tearoff=0)
+        self.menubar.add_command(label="Change username",
                             command=lambda: self.usernameWindowSetUp(self.root))
-        menubar.add_command(label="Exit", command=lambda: self.root.destroy())
-        menubar.add_command(label="TicTacToe", command=lambda: self.launchTicTacToe(self.root))
+        self.menubar.add_command(label="Exit", command=lambda: self.root.destroy())
+        self.menubar.add_command(label="TicTacToe", command=lambda: self.launchTicTacToe(self.root))
 
-        self.root.config(menu=menubar)
+        self.root.config(menu=self.menubar)
 
         main_body = Frame(self.root, height=20, width=50)
 
@@ -350,6 +350,7 @@ class P2pGame:
         # top = Toplevel(master)
         # top.title("Tic Tac Toe")
         # top.grab_set()
+        self.menubar.entryconfig("TicTacToe", state="disabled")
         self.TicGame = Game(root, self, Player=self.PLAYER_TYPE)
         self.TicGame.mainloop()
 
@@ -413,6 +414,14 @@ class P2pGame:
         else:
             return
 
+    def sendPlayAgain(self, text):
+        if("--A" in text):
+            for person in self.connectionList:
+                self.socketSend(person, text)
+        else:
+            return
+
+
 
     """
     Structure the response like this 'username : text'
@@ -467,6 +476,10 @@ class P2pGame:
                     x = int(data[4:].split(":")[0])
                     y = int(data[4:].split(":")[1])
                     self.TicGame.new_move(x, y, 2)
+                    self.playerTurn = 'X'
+                elif ("--A" in data):
+                    self.TicGame.new_board()
+                    self.TicGame.gamestate = self.TicGame.FIRST_PLAYER
                     self.playerTurn = 'X'
                 else:
                     self.writeToScreen(data, self.usernameList[conn])

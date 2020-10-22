@@ -219,6 +219,7 @@ class Game(Tk):
             #reset
             self.new_board()
             self.gamestate = self.FIRST_PLAYER
+            self.p2pGame.sendPlayAgain("--A")
         
 
     def new_move(self, grid_x, grid_y, player):
