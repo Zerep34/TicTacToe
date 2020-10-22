@@ -513,9 +513,7 @@ class Server(threading.Thread):
         self.port = port
 
     def run(self):
-        self.p2pgame.connectionList
-        global PLAYER_TYPE
-        PLAYER_TYPE = "X"
+        self.p2pgamePLAYER_TYPE = "X"
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.bind(('', self.port))
 
@@ -545,8 +543,8 @@ class Server(threading.Thread):
         self.p2pgame.statusConnect.set("Disconnect")
         self.p2pgame.connectionButton.config(state=NORMAL)
 
-        conn.send(self.p2pgame.checkNumberStructure(len(username)).encode())
-        conn.send(username.encode())
+        conn.send(self.p2pgame.checkNumberStructure(len(self.p2pgame.username)).encode())
+        conn.send(self.p2pgame.username.encode())
 
         data = conn.recv(4)
         data = conn.recv(int(data.decode()))
