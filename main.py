@@ -457,7 +457,7 @@ class P2pGame:
                 elif("--W:O" == data):
                     self.TicGame.gamestate = TicGame.STATE_GAME_OVER
                     self.TicGame.gameover_screen('O WINS')
-                elif("--W:O" == data):
+                elif("--W:X" == data):
                     self.TicGame.gamestate = TicGame.STATE_GAME_OVER
                     self.TicGame.gameover_screen('X WINS')
                 elif("--X:" in data):
