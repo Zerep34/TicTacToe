@@ -1,40 +1,5 @@
 from tkinter import *
 import sys
-# PARAMETERS
-# graphics
-WINDOW_SIZE = 400 # pixels
-GRID_LINE_WIDTH = 2 # pixels
-SYMBOL_WIDTH = WINDOW_SIZE/12 # pixels - adjust ratio
-
-# 0-1 : size of a symbol relative to it's cell
-# bigger than 1 is too much
-SYMBOL_SIZE = 0.5
-
-X_COLOR = 'goldenrod'
-O_COLOR = 'red3'
-# background color of the 'draw' gameover screen
-DRAW_SCREEN_COLOR = 'light sea green'
-GRID_COLOR = 'light grey'
-BG_COLOR = 'white'
-
-# gameplay
-FIRST_PLAYER = 2 # 1 - X, 2 = O
-ACTUAL_PLAYER_TURN = 'O'
-
-# OTHER
-CELL_SIZE = WINDOW_SIZE / 3
-
-# game states
-STATE_TITLE_SCREEN = 0
-STATE_X_TURN = 1
-STATE_O_TURN = 2
-STATE_GAME_OVER = 3
-
-# symbol notation in the board memory
-EMPTY = 0
-X = 1
-O = 2
-
 
 class Game(Tk):
     """
@@ -42,25 +7,44 @@ class Game(Tk):
     """
     def __init__(self, tk, P2pGame):
         self.p2pGame = P2pGame
+        self.GRID_LINE_WIDTH = 2 # pixels
+        self.WINDOW_SIZE = 400 # pixels*
+        self.SYMBOL_SIZE = 0.5
+        self.X_COLOR = 'goldenrod'
+        self.O_COLOR = 'red3'
+        self.DRAW_SCREEN_COLOR = 'light sea green'
+        self.GRID_COLOR = 'light grey'
+        self.BG_COLOR = 'white'
+        self.FIRST_PLAYER = 2
+        self.ACTUAL_PLAYER_TURN = 'O'
+        self.CELL_SIZE = self.WINDOW_SIZE / 3
+        self.STATE_TITLE_SCREEN = 0
+        self.STATE_X_TURN = 1
+        self.STATE_O_TURN = 2
+        self.STATE_GAME_OVER = 3
+        self.EMPTY = 0
+        self.X = 1
+        self.O = 2
+        self.SYMBOL_WIDTH = self.WINDOW_SIZE/12 # pixels - adjust ratio
         self.tk = tk
         # Tk.__init__(self)
         self.canvas = Canvas(
-            height=WINDOW_SIZE, width=WINDOW_SIZE,
-            bg=BG_COLOR)
+            height=self.WINDOW_SIZE, width=self.WINDOW_SIZE,
+            bg=self.BG_COLOR)
 
         self.canvas.pack()
         self.bind('<x>', self.exit)
         self.canvas.bind('<Button-1>', self.click)
 
-        self.gamestate = STATE_TITLE_SCREEN
+        self.gamestate = self.STATE_TITLE_SCREEN
         self.title_screen()
 
         self.board = [
-            [EMPTY, EMPTY, EMPTY],
-            [EMPTY, EMPTY, EMPTY],
-            [EMPTY, EMPTY, EMPTY]]
+            [self.EMPTY, self.EMPTY, self.EMPTY],
+            [self.EMPTY, self.EMPTY, self.EMPTY],
+            [self.EMPTY, self.EMPTY, self.EMPTY]]
         self.new_board()
-        self.gamestate = FIRST_PLAYER
+        self.gamestate = self.FIRST_PLAYER
         # #self.launch()
 
 
@@ -70,7 +54,7 @@ class Game(Tk):
 
         self.canvas.create_rectangle(
             0, 0,
-            WINDOW_SIZE, WINDOW_SIZE,
+            self.WINDOW_SIZE, self.WINDOW_SIZE,
             fill="gray",
             outline='')
 
@@ -87,16 +71,16 @@ class Game(Tk):
         #     outline='')
 
         self.canvas.create_text(
-            WINDOW_SIZE/2,
-            WINDOW_SIZE/3,
+            self.WINDOW_SIZE/2,
+            self.WINDOW_SIZE/3,
             text='TIC TAC TOE', fill='white',
-            font=('Franklin Gothic', int(-WINDOW_SIZE/12), 'bold'))
+            font=('Franklin Gothic', int(-self.WINDOW_SIZE/12), 'bold'))
 
         self.canvas.create_text(
-            int(WINDOW_SIZE/2),
-            int(WINDOW_SIZE/2.5),
+            int(self.WINDOW_SIZE/2),
+            int(self.WINDOW_SIZE/2.5),
             text='[play]', fill='white',
-            font=('Franklin Gothic', int(-WINDOW_SIZE/25)))
+            font=('Franklin Gothic', int(-self.WINDOW_SIZE/25)))
 
     def new_board(self):
         """
@@ -108,22 +92,22 @@ class Game(Tk):
 
         # reset
         self.board = [
-            [EMPTY, EMPTY, EMPTY],
-            [EMPTY, EMPTY, EMPTY],
-            [EMPTY, EMPTY, EMPTY]]
+            [self.EMPTY, self.EMPTY, self.EMPTY],
+            [self.EMPTY, self.EMPTY, self.EMPTY],
+            [self.EMPTY, self.EMPTY, self.EMPTY]]
 
         # draw grid
         for n in range(1, 3):
             # vertical
             self.canvas.create_line(
-                CELL_SIZE*n, 0,
-                CELL_SIZE*n, WINDOW_SIZE,
-                width=GRID_LINE_WIDTH, fill=GRID_COLOR)
+                self.CELL_SIZE*n, 0,
+                self.CELL_SIZE*n, self.WINDOW_SIZE,
+                width=self.GRID_LINE_WIDTH, fill=self.GRID_COLOR)
             # horizontal
             self.canvas.create_line(
-                0, CELL_SIZE*n,
-                WINDOW_SIZE, CELL_SIZE*n,
-                width=GRID_LINE_WIDTH, fill=GRID_COLOR)
+                0, self.CELL_SIZE*n,
+                self.WINDOW_SIZE, self.CELL_SIZE*n,
+                width=self.GRID_LINE_WIDTH, fill=self.GRID_COLOR)
 
     def gameover_screen(self, outcome):
         #placeholder gameover screen
@@ -132,30 +116,30 @@ class Game(Tk):
 
         if outcome == 'X WINS':
             wintext = 'X wins'
-            wincolor = X_COLOR
+            wincolor = self.X_COLOR
 
         elif outcome == 'O WINS':
             wintext = 'O wins'
-            wincolor = O_COLOR
+            wincolor = self.O_COLOR
 
         elif outcome == 'DRAW':
             wintext = 'Draw'
-            wincolor = DRAW_SCREEN_COLOR
+            wincolor = self.DRAW_SCREEN_COLOR
 
         self.canvas.create_rectangle(
             0, 0,
-            WINDOW_SIZE, WINDOW_SIZE,
+            self.WINDOW_SIZE, self.WINDOW_SIZE,
             fill=wincolor, outline='')
 
         self.canvas.create_text(
-            int(WINDOW_SIZE/2), int(WINDOW_SIZE/2),
+            int(self.WINDOW_SIZE/2), int(self.WINDOW_SIZE/2),
             text=wintext, fill='white',
-            font=('Franklin Gothic', int(-WINDOW_SIZE/6), 'bold'))
+            font=('Franklin Gothic', int(-self.WINDOW_SIZE/6), 'bold'))
 
         self.canvas.create_text(
-                int(WINDOW_SIZE/2), int(WINDOW_SIZE/1.65),
+                int(self.WINDOW_SIZE/2), int(self.WINDOW_SIZE/1.65),
                 text='[click to play again]', fill='white',
-                font=('Franklin Gothic', int(-WINDOW_SIZE/25)))
+                font=('Franklin Gothic', int(-self.WINDOW_SIZE/25)))
 
     # def launch(self):
         
@@ -194,24 +178,24 @@ class Game(Tk):
         # x = loc[0]
         # y = loc[1]
 
-        # if self.gamestate == STATE_TITLE_SCREEN:
+        # if self.gamestate == self.STATE_TITLE_SCREEN:
             # self.new_board()
             # self.gamestate = FIRST_PLAYER
 
 
         #duplication /!\
-        if (self.gamestate == STATE_X_TURN and self.board[y][x] == EMPTY):
-            self.new_move(X, x, y)
+        if (self.gamestate == self.STATE_X_TURN and self.board[y][x] == self.EMPTY):
+            self.new_move(self.X, x, y)
 
-            if self.has_won(X):
-                self.gamestate = STATE_GAME_OVER
+            if self.has_won(self.X):
+                self.gamestate = self.STATE_GAME_OVER
                 self.gameover_screen('X WINS')
                 data = "--W:X"
                 self.p2pGame.sendTicTacToeData(text=data)
 
 
             elif self.is_a_draw():
-                self.gamestate = STATE_GAME_OVER
+                self.gamestate = self.STATE_GAME_OVER
                 self.gameover_screen('DRAW')
                 data = "--D"
                 self.p2pGame.sendTicTacToeData(text=data)
@@ -219,34 +203,34 @@ class Game(Tk):
             else:
                 data = "--X:" + str(x) + ":" + str(y)
                 self.p2pGame.sendTicTacToeData(text=data)
-                self.gamestate = STATE_O_TURN
+                self.gamestate = self.STATE_O_TURN
                 #self.launch()
 
-        elif (self.gamestate == STATE_O_TURN and self.board[y][x] == EMPTY):
-            self.new_move(O, x, y)
+        elif (self.gamestate == self.STATE_O_TURN and self.board[y][x] == self.EMPTY):
+            self.new_move(self.O, x, y)
 
-            if self.has_won(O):
-                self.gamestate = STATE_GAME_OVER
+            if self.has_won(self.O):
+                self.gamestate = self.STATE_GAME_OVER
                 self.gameover_screen('O WINS')
                 data = "--W:O"
                 self.p2pGame.sendTicTacToeData(text=data)
 
             elif self.is_a_draw():
-                self.gamestate = STATE_GAME_OVER
+                self.gamestate = self.STATE_GAME_OVER
                 self.gameover_screen('DRAW')
                 data = "--D"
                 self.p2pGame.sendTicTacToeData(text=data)
 
             else:
-                self.gamestate = STATE_X_TURN
+                self.gamestate = self.STATE_X_TURN
                 data = "--O:" + str(x) + ":" + str(y)
                 self.p2pGame.sendTicTacToeData(text=data)
                 #self.launch()
 
-        elif self.gamestate == STATE_GAME_OVER:
+        elif self.gamestate == self.STATE_GAME_OVER:
             #reset
             self.new_board()
-            self.gamestate = FIRST_PLAYER
+            self.gamestate = self.FIRST_PLAYER
         
 
     def new_move(self, player, grid_x, grid_y):
@@ -261,13 +245,13 @@ class Game(Tk):
 
         """
         #duplication /!\
-        if player == X:
+        if player == self.X:
             self.draw_X(grid_x, grid_y)
-            self.board[grid_y][grid_x] = X
+            self.board[grid_y][grid_x] = self.X
 
-        elif player == O:
+        elif player == self.O:
             self.draw_O(grid_x, grid_y)
-            self.board[grid_y][grid_x] = O
+            self.board[grid_y][grid_x] = self.O
 
     def draw_X(self, grid_x, grid_y):
         """
@@ -276,17 +260,17 @@ class Game(Tk):
 
         x = self.gtpix(grid_x)
         y = self.gtpix(grid_y)
-        delta = CELL_SIZE/2*SYMBOL_SIZE
+        delta = self.CELL_SIZE/2*self.SYMBOL_SIZE
 
         self.canvas.create_line(
             x-delta, y-delta,
             x+delta, y+delta,
-            width=SYMBOL_WIDTH, fill=X_COLOR)
+            width=self.SYMBOL_WIDTH, fill=self.X_COLOR)
 
         self.canvas.create_line(
             x+delta, y-delta,
             x-delta, y+delta,
-            width=SYMBOL_WIDTH, fill=X_COLOR)
+            width=self.SYMBOL_WIDTH, fill=self.X_COLOR)
 
     def draw_O(self, grid_x, grid_y):
         """
@@ -297,12 +281,12 @@ class Game(Tk):
 
         x = self.gtpix(grid_x)
         y = self.gtpix(grid_y)
-        delta = CELL_SIZE/2*SYMBOL_SIZE
+        delta = self.CELL_SIZE/2*self.SYMBOL_SIZE
 
         self.canvas.create_oval(
             x-delta, y-delta,
             x+delta, y+delta,
-            width=SYMBOL_WIDTH, outline=O_COLOR)
+            width=self.SYMBOL_WIDTH, outline=self.O_COLOR)
 
     def has_won(self, symbol):
         for y in range(3):
@@ -324,10 +308,10 @@ class Game(Tk):
 
     def is_a_draw(self):
         for row in self.board:
-            if EMPTY in row:
+            if self.EMPTY in row:
                 return False
 
-        #no empty cell left, the game is a draw
+        #no self.EMPTY cell left, the game is a draw
         return True
 
     def gtpix(self, grid_coord):
@@ -335,7 +319,7 @@ class Game(Tk):
         # for a grid coordinate, returns the pixel coordinate of the center
         # of the corresponding cell
 
-        pixel_coord = grid_coord * CELL_SIZE + CELL_SIZE / 2
+        pixel_coord = grid_coord * self.CELL_SIZE + self.CELL_SIZE / 2
         return pixel_coord
 
     def ptgrid(self, pixel_coord):
@@ -343,10 +327,10 @@ class Game(Tk):
         # the opposit of gtpix()
 
         # somehow the canvas has a few extra pixels on the right and bottom side
-        if pixel_coord >= WINDOW_SIZE:
-            pixel_coord = WINDOW_SIZE - 1    
+        if pixel_coord >= self.WINDOW_SIZE:
+            pixel_coord = self.WINDOW_SIZE - 1    
 
-        grid_coord = int(pixel_coord / CELL_SIZE)
+        grid_coord = int(pixel_coord / self.CELL_SIZE)
         return grid_coord
 
     def exit(self, event):
