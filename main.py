@@ -19,6 +19,7 @@ class P2pGame:
         self.mainTextArea = 0
 
         self.PLAYER_TYPE = ""
+        self.playerTurn = 'X'
         self.TicGame = None
         self.root = Tk()
         self.root.title("Tic Tac Toe")
@@ -458,13 +459,17 @@ class P2pGame:
                     self.TicGame.gamestate = self.TicGame.STATE_GAME_OVER
                     self.TicGame.gameover_screen('X WINS')
                 elif("--X:" in data):
-                    x = int(data[4:].split(":")[0])
-                    y = int(data[4:].split(":")[1])
-                    self.TicGame.new_move(x, y, 1)
+                    if(self.playerTurn == 'X'):
+                        x = int(data[4:].split(":")[0])
+                        y = int(data[4:].split(":")[1])
+                        self.TicGame.new_move(x, y, 1)
+                        self.playerTurn == 'O'
                 elif("--O:" in data):
-                    x = int(data[4:].split(":")[0])
-                    y = int(data[4:].split(":")[1])
-                    self.TicGame.new_move(x, y, 2)
+                    if(self.playerTurn == 'O'):
+                        x = int(data[4:].split(":")[0])
+                        y = int(data[4:].split(":")[1])
+                        self.TicGame.new_move(x, y, 2)
+                        self.playerTurn == 'X'
                 else:
                     self.writeToScreen(data, self.usernameList[conn])
 
