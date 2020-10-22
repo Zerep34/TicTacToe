@@ -233,7 +233,7 @@ class Game(Tk):
             self.gamestate = self.FIRST_PLAYER
         
 
-    def new_move(self, player, grid_x, grid_y):
+    def new_move(self, grid_x, grid_y, player):
         """
         player is either X or O
         x and y are 0-based grid coordinates
