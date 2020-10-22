@@ -604,7 +604,7 @@ class Client(threading.Thread):
 
         self.p2pGame.connectionList.append(conn)
 
-        conn.send(self.p2pGame.checkNumberStructure(len(username)).encode())
+        conn.send(self.p2pGame.checkNumberStructure(len(self.p2pGame.username)).encode())
         conn.send(self.p2pGame.username.encode())
 
         data = conn.recv(4)
