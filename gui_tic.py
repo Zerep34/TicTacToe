@@ -1,5 +1,5 @@
 from tkinter import *
-
+import sys
 # PARAMETERS
 # graphics
 WINDOW_SIZE = 600 # pixels
@@ -58,8 +58,10 @@ class Game(Tk):
             [EMPTY, EMPTY, EMPTY],
             [EMPTY, EMPTY, EMPTY],
             [EMPTY, EMPTY, EMPTY]]
-
+        self.new_board()
+        self.gamestate = FIRST_PLAYER
         self.launch()
+
 
     def title_screen(self):
     # placeholder title screen
@@ -155,33 +157,51 @@ class Game(Tk):
                 font=('Franklin Gothic', int(-WINDOW_SIZE/25)))
 
     def launch(self):
-        print("Case [x,y] : ")
+        
         loc = [-1,-1]
-        while(loc[0] < 0 or loc[0] > 2 ):
-            print("X : ")
-            x = int(input())
-            print("Y : ")
-            y = int(input())
-            loc = [x,y]
-            print(loc)
-    def click(self, event):
+        while(loc[0] < 0 or loc[0] > 2 or loc[1] < 0 or loc[1] > 2 ):
+            print("-> new : restart the game\n -> end : stop the game \n ->  Case [x,y] : input")
+            mess = input() 
+            if(mess == "new"):
+                self.new_board()
+                self.gamestate = FIRST_PLAYER
+            elif(mess == "end"):
+                print("quit")
+                sys.exit()
+            else:
+                try:
+                    print("Case X 0<=X<=2 : ")
+                    x = int(mess)
+                    print("Case Y 0<=Y<=2: ")
+                    mess = input()
+                    y = int(mess)
+                    loc = [x,y]
+                    print(loc)
+                except:
+                    print("Veuillez fournir un entier ! ")
+                    pass
+        self.click(loc)
+    def click(self, loc):
         """
         Handles most of the game logic
         I probably should move it elswhere but it's pretty short
         """
 
-        x = self.ptgrid(event.x)
-        print(x)
-        y = self.ptgrid(event.y)
-        print(y)
+        # x = self.ptgrid(event.x)
+        # print(x)
+        # y = self.ptgrid(event.y)
+        # print(y)
 
-        if self.gamestate == STATE_TITLE_SCREEN:
-            self.new_board()
-            self.gamestate = FIRST_PLAYER
+        x = loc[0]
+        y = loc[1]
+
+        # if self.gamestate == STATE_TITLE_SCREEN:
+            # self.new_board()
+            # self.gamestate = FIRST_PLAYER
 
 
         #duplication /!\
-        elif (self.gamestate == STATE_X_TURN and
+        if (self.gamestate == STATE_X_TURN and
                 self.board[y][x] == EMPTY):
             self.new_move(X, x, y)
 
@@ -195,6 +215,7 @@ class Game(Tk):
 
             else:
                 self.gamestate = STATE_O_TURN
+                self.launch()
 
         elif (self.gamestate == STATE_O_TURN and
                 self.board[y][x] == EMPTY):
@@ -210,11 +231,13 @@ class Game(Tk):
 
             else:
                 self.gamestate = STATE_X_TURN
+                self.launch()
 
         elif self.gamestate == STATE_GAME_OVER:
             #reset
             self.new_board()
             self.gamestate = FIRST_PLAYER
+        
 
     def new_move(self, player, grid_x, grid_y):
         """
