@@ -460,11 +460,11 @@ class P2pGame:
                 elif("--X:" in data):
                     x = int(data[4:].split(":")[0])
                     y = int(data[4:].split(":")[1])
-                    self.TicGame.new_move(x, y)
+                    self.TicGame.new_move(x, y, 1)
                 elif("--O:" in data):
                     x = int(data[4:].split(":")[0])
                     y = int(data[4:].split(":")[1])
-                    self.TicGame.new_move(x, y)
+                    self.TicGame.new_move(x, y, 2)
                 else:
                     self.writeToScreen(data, self.usernameList[conn])
 
