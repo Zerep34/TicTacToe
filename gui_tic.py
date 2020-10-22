@@ -170,21 +170,21 @@ class Game(Tk):
                     else:
                         self.gameover_screen('O WINS')
                         data = "--W:O"
-                    self.p2pGame.sendTicTacToeData(text=data)
                     self.p2pGame.playerTurn = 'X'
+                    self.p2pGame.sendTicTacToeData(text=data)
 
 
                 elif self.is_a_draw():
                     self.gamestate = self.STATE_GAME_OVER
                     self.gameover_screen('DRAW')
                     data = "--D"
-                    self.p2pGame.sendTicTacToeData(text=data)
                     self.p2pGame.playerTurn = 'X'
+                    self.p2pGame.sendTicTacToeData(text=data)
 
                 else:
                     data = "--X:"+ str(x) + ":" + str(y)
-                    self.p2pGame.sendTicTacToeData(text=data)
                     self.p2pGame.playerTurn = 'O'
+                    self.p2pGame.sendTicTacToeData(text=data)
                     # self.gamestate = self.STATE_O_TURN
                     #self.launch()
             elif(self.p2pGame.playerTurn == 'O' and self.player == 2):
@@ -198,21 +198,21 @@ class Game(Tk):
                     else:
                         self.gameover_screen('O WINS')
                         data = "--W:O"
-                    self.p2pGame.sendTicTacToeData(text=data)
                     self.p2pGame.playerTurn = 'X'
+                    self.p2pGame.sendTicTacToeData(text=data)
 
 
                 elif self.is_a_draw():
                     self.gamestate = self.STATE_GAME_OVER
                     self.gameover_screen('DRAW')
                     data = "--D"
-                    self.p2pGame.sendTicTacToeData(text=data)
                     self.p2pGame.playerTurn = 'X'
+                    self.p2pGame.sendTicTacToeData(text=data)
 
                 else:
                     data = "--O:"+ str(x) + ":" + str(y)
-                    self.p2pGame.sendTicTacToeData(text=data)
                     self.p2pGame.playerTurn = 'X'
+                    self.p2pGame.sendTicTacToeData(text=data)
                     # self.gamestate = self.STATE_O_TURN
                     #self.launch()
         elif self.gamestate == self.STATE_GAME_OVER:
