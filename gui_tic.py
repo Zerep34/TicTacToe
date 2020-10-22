@@ -171,6 +171,7 @@ class Game(Tk):
                         self.gameover_screen('O WINS')
                         data = "--W:O"
                     self.p2pGame.sendTicTacToeData(text=data)
+                    self.p2pGame.playerTurn = 'X'
 
 
                 elif self.is_a_draw():
@@ -178,10 +179,12 @@ class Game(Tk):
                     self.gameover_screen('DRAW')
                     data = "--D"
                     self.p2pGame.sendTicTacToeData(text=data)
+                    self.p2pGame.playerTurn = 'X'
 
                 else:
                     data = "--X:"+ str(x) + ":" + str(y)
                     self.p2pGame.sendTicTacToeData(text=data)
+                    self.p2pGame.playerTurn = 'O'
                     # self.gamestate = self.STATE_O_TURN
                     #self.launch()
             elif(self.p2pGame.playerTurn == 'O' and self.player == 2):
@@ -196,6 +199,7 @@ class Game(Tk):
                         self.gameover_screen('O WINS')
                         data = "--W:O"
                     self.p2pGame.sendTicTacToeData(text=data)
+                    self.p2pGame.playerTurn = 'X'
 
 
                 elif self.is_a_draw():
@@ -203,10 +207,12 @@ class Game(Tk):
                     self.gameover_screen('DRAW')
                     data = "--D"
                     self.p2pGame.sendTicTacToeData(text=data)
+                    self.p2pGame.playerTurn = 'X'
 
                 else:
                     data = "--O:"+ str(x) + ":" + str(y)
                     self.p2pGame.sendTicTacToeData(text=data)
+                    self.p2pGame.playerTurn = 'X'
                     # self.gamestate = self.STATE_O_TURN
                     #self.launch()
         elif self.gamestate == self.STATE_GAME_OVER:
