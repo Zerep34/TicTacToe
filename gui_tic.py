@@ -189,8 +189,12 @@ class Game(Tk):
 
             if self.has_won(self.player):
                 self.gamestate = self.STATE_GAME_OVER
-                self.gameover_screen('X WINS') if self.player == 1  else self.gameover_screen('Y WINS')
-                data = "--W:X" if self.player == 1  else data = "--W:O"
+                if self.player == 1:
+                    self.gameover_screen('X WINS')
+                    data = "--W:X"
+                else:
+                    self.gameover_screen('Y WINS')
+                    data = "--W:O"
                 self.p2pGame.sendTicTacToeData(text=data)
 
 
@@ -201,7 +205,10 @@ class Game(Tk):
                 self.p2pGame.sendTicTacToeData(text=data)
 
             else:
-                data = "--X:"+ str(x) + ":" + str(y) if self.player == 1  else data = "--O:"+ str(x) + ":" + str(y)
+                if self.player == 1:
+                    data = "--X:"+ str(x) + ":" + str(y)
+                else:
+                    data = "--O:"+ str(x) + ":" + str(y)
                 self.p2pGame.sendTicTacToeData(text=data)
                 # self.gamestate = self.STATE_O_TURN
                 #self.launch()
