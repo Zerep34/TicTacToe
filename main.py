@@ -452,22 +452,22 @@ class P2pGame:
             data = self.socketReceive(conn)
             if data != 1:
                 if("--D" == data):
-                    self.TicGame.gamestate = TicGame.STATE_GAME_OVER
+                    self.TicGame.gamestate = self.TicGame.STATE_GAME_OVER
                     self.TicGame.gameover_screen('DRAW')
                 elif("--W:O" == data):
-                    self.TicGame.gamestate = TicGame.STATE_GAME_OVER
+                    self.TicGame.gamestate = self.TicGame.STATE_GAME_OVER
                     self.TicGame.gameover_screen('O WINS')
                 elif("--W:X" == data):
-                    self.TicGame.gamestate = TicGame.STATE_GAME_OVER
+                    self.TicGame.gamestate = self.TicGame.STATE_GAME_OVER
                     self.TicGame.gameover_screen('X WINS')
                 elif("--X:" in data):
                     x = int(data[4:].split(":")[0])
                     y = int(data[4:].split(":")[1])
-                    self.TicGame.new_move(TicGame.X, x, y)
+                    self.TicGame.new_move(self.TicGame.X, x, y)
                 elif("--O:" in data):
                     x = int(data[4:].split(":")[0])
                     y = int(data[4:].split(":")[1])
-                    self.TicGame.new_move(TicGame.O, x, y)
+                    self.TicGame.new_move(self.TicGame.O, x, y)
                 else:
                     self.writeToScreen(data, self.usernameList[conn])
 
