@@ -27,11 +27,11 @@ class P2pGame:
         self.menubar = Menu(self.root)
 
         file_menu = Menu(self.menubar, tearoff=0)
-        self.menubar.add_command(label="Change username",
+        self.menubar.add_command(label="Changer pseudo",
                             command=lambda: self.usernameWindowSetUp(self.root))
-        self.menubar.add_command(label="Exit", command=lambda: self.root.destroy())
+        self.menubar.add_command(label="Quitter", command=lambda: self.root.destroy())
         self.menubar.add_command(label="TicTacToe", command=lambda: self.launchTicTacToe(self.root))
-
+        self.menubar.entryconfig("TicTacToe", state="disabled")
         self.root.config(menu=self.menubar)
 
         main_body = Frame(self.root, height=20, width=50)
@@ -47,7 +47,7 @@ class P2pGame:
 
         main_body.pack()
 
-        self.mainTextArea.insert(END, "Welcome to the chat program!")
+        self.mainTextArea.insert(END, "Bienvenue dans dans ce Tic Tac Toe!")
         self.mainTextArea.config(state=DISABLED)
 
         self.text_input = Entry(self.root, width=60)
@@ -55,12 +55,12 @@ class P2pGame:
         self.text_input.pack()
 
         self.statusConnect = StringVar()
-        self.statusConnect.set("Connect")
+        self.statusConnect.set("Connexion")
         self.clientType = 1
         Radiobutton(self.root, text="Client", variable=self.clientType,
                     value=0, command=self.ClientRadioButton).pack(anchor=E)
 
-        Radiobutton(self.root, text="Server", variable=self.clientType,
+        Radiobutton(self.root, text="Serveur", variable=self.clientType,
                     value=1, command=self.ServerRadioButton).pack(anchor=E)
 
         self.connectionButton = Button(self.root, textvariable=self.statusConnect,
@@ -96,7 +96,7 @@ class P2pGame:
         except socket.error:
             if len(self.connectionList) != 0:
                 self.writeToScreen(
-                    "Connection issue. Sending message failed.", "System")
+                    "Problème de connexion. Erreur lors de l'envoie d'un message.", "Système")
                 self.headerCheck("-001")
 
 
@@ -116,7 +116,7 @@ class P2pGame:
         except socket.error:
             if len(self.connectionList) != 0:
                 self.writeToScreen(
-                    "Connection issue. Receiving message failed.", "System")
+                    "Problème de connexion. Erreur lors de l'envoie d'un message", "Système")
             self.headerCheck("-001")
 
 
@@ -132,19 +132,19 @@ class P2pGame:
             # in the event of single connection being left or if we're just a
             # client
             if len(self.connectionList) == 1:
-                self.writeToScreen("Connection closed.", "System")
+                self.writeToScreen("Connexion fermé", "Système")
                 dump = self.connectionList.pop()
                 try:
                     dump.close()
                 except socket.error:
-                    print("Issue with someone being bad about disconnecting")
+                    print("Problème avec un contact")
                 self.statusConnect.set("Connect")
                 self.connectionButton.config(state=NORMAL)
                 return
 
             if conn != None:
-                self.writeToScreen("Connect to " + conn.getsockname()
-                            [0] + " closed.", "System")
+                self.writeToScreen("Connexion à " + conn.getsockname()
+                            [0] + " fermé", "Système")
                 self.connectionList.remove(conn)
                 conn.close()
 
@@ -152,7 +152,7 @@ class P2pGame:
             name = self.socketReceive(conn)
             if (self.AvailableUsername(name)):
                 self.writeToScreen(
-                    "User " + self.usernameList[conn] + " has changed their username to " + name, "System")
+                    "L'utilisateur " + self.usernameList[conn] + " a changé son pseudo sur " + name, "Système")
                 self.usernameList[conn] = name
                 self.contact_array[
                     conn.getpeername()[0]] = [conn.getpeername()[1], name]
@@ -176,17 +176,17 @@ class P2pGame:
         if command == "nick":  # change nickname
             for letter in param[0]:
                 if letter == " " or letter == "\n":
-                    self.ExceptionWindow(self.root, "Invalid username. No spaces allowed.")
+                    self.ExceptionWindow(self.root, "Pseudo non valide. Les espaces ne sont pas autorisés")
                     return
             if self.AvailableUsername(param[0]):
-                self.writeToScreen("Username is being changed to " + param[0], "System")
+                self.writeToScreen("Le pseudo a été changé pour " + param[0], "Système")
                 for conn in self.connectionList:
                     conn.send("-002".encode())
                     self.socketSend(conn, param[0])
                 self.username = param[0]
             else:
                 self.writeToScreen(param[0] +
-                            " is already taken as a username", "System")
+                            " est déjà pris par un autre utilisateur", "Système")
         if command == "disconnect":  # disconnects from current connection
             for conn in self.connectionList:
                 conn.send("-001".encode())
@@ -268,14 +268,14 @@ class P2pGame:
     def checkOptionsStructure(self, por, loc=""):
         global root
         if not por.isdigit():
-            self.ExceptionWindow(self.root, "Please input a port number.")
+            self.ExceptionWindow(self.root, "Entrez un numéro de port valide")
             return False
         if int(por) < 0 or 65555 < int(por):
-            self.ExceptionWindow(self.root, "Please input a port number between 0 and 65555")
+            self.ExceptionWindow(self.root, "Entrez un numéro de port compris entre 0 and 65555")
             return False
         if loc != "":
             if not self.checkIpStructure(loc.split(".")):
-                self.ExceptionWindow(self.root, "Please input a valid ip address.")
+                self.ExceptionWindow(self.root, "Entrez une adresse IP valide")
                 return False
         return True
 
@@ -304,14 +304,14 @@ class P2pGame:
 
     def optionsWindowServerSide(self, master):
         top = Toplevel(master)
-        top.title("Connection options")
+        top.title("Options de connexion")
         top.grab_set()
         top.protocol("WM_DELETE_WINDOW", lambda: self.optionDelete(top))
         Label(top, text="Port:").grid(row=0)
         port = Entry(top)
         port.grid(row=0, column=1)
         port.focus_set()
-        go = Button(top, text="Launch", command=lambda:
+        go = Button(top, text="Lancer", command=lambda:
                     self.processServerOptions(port.get(), top))
         go.grid(row=1, column=1)
 
@@ -335,13 +335,13 @@ class P2pGame:
 
     def usernameWindowSetUp(self, master):
         top = Toplevel(master)
-        top.title("Username options")
+        top.title("Options de pseudo")
         top.grab_set()
-        Label(top, text="Username:").grid(row=0)
+        Label(top, text="Pseudo:").grid(row=0)
         name = Entry(top)
         name.focus_set()
         name.grid(row=0, column=1)
-        go = Button(top, text="Change", command=lambda:
+        go = Button(top, text="Changer", command=lambda:
                     self.processUsernameOptions(name.get(), top))
         go.grid(row=1, column=1)
 
@@ -372,7 +372,7 @@ class P2pGame:
 
     def ExceptionWindow(self, master, texty):
         window = Toplevel(master)
-        window.title("ERROR")
+        window.title("ERREUR")
         window.grab_set()
         Label(window, text=texty).pack()
         go = Button(window, text="OK", command=window.destroy)
@@ -460,13 +460,13 @@ class P2pGame:
             if data != 1:
                 if("--D" == data):
                     self.TicGame.gamestate = self.TicGame.STATE_GAME_OVER
-                    self.TicGame.gameover_screen('DRAW')
+                    self.TicGame.gameover_screen('Egalité')
                 elif("--W:O" == data):
                     self.TicGame.gamestate = self.TicGame.STATE_GAME_OVER
-                    self.TicGame.gameover_screen('O WINS')
+                    self.TicGame.gameover_screen('O Gagne')
                 elif("--W:X" == data):
                     self.TicGame.gamestate = self.TicGame.STATE_GAME_OVER
-                    self.TicGame.gameover_screen('X WINS')
+                    self.TicGame.gameover_screen('X Gagne')
                 elif("--X:" in data):
                     x = int(data[4:].split(":")[0])
                     y = int(data[4:].split(":")[1])
@@ -532,8 +532,8 @@ class Server(threading.Thread):
 
         if len(self.p2pgame.connectionList) == 0:
             self.p2pgame.writeToScreen(
-                "Socket is good, waiting for connections on port: " +
-                str(self.port), "System")
+                "Le socket est bon, en attente d'une connexion sur le port: " +
+                str(self.port), "Système")
         s.listen(1)
         global conn_init
         conn_init, addr_init = s.accept()
@@ -551,9 +551,9 @@ class Server(threading.Thread):
         conn_init.close()
         conn, addr = serv.accept()
         self.p2pgame.connectionList.append(conn)  # add an array entry for this connection
-        self.p2pgame.writeToScreen("Connected by " + str(addr[0]), "System")
-
-        self.p2pgame.statusConnect.set("Disconnect")
+        self.p2pgame.writeToScreen(str(addr[0] + " est connecté"), "Système")
+        self.p2pgame.menubar.entryconfig("TicTacToe", state="enabled")
+        self.p2pgame.statusConnect.set("Déconnecté")
         self.p2pgame.connectionButton.config(state=NORMAL)
 
         conn.send(self.p2pgame.checkNumberStructure(len(self.p2pgame.username)).encode())
@@ -593,12 +593,12 @@ class Client(threading.Thread):
         try:
             conn_init.connect((self.host, self.port))
         except socket.timeout:
-            self.p2pGame.writeToScreen("Timeout issue. Host possible not there.", "System")
+            self.p2pGame.writeToScreen("Temps de réponse dépassé. Le serveur n'est pas disponible", "Système")
             self.p2pGame.connectionButton.config(state=NORMAL)
             raise SystemExit(0)
         except socket.error:
             self.p2pGame.writeToScreen(
-                "Connection issue. Host actively refused connection.", "System")
+                "Problème de connexion, le serveur a refusé la connexion", "Système")
             self.p2pGame.connectionButton.config(state=NORMAL)
             raise SystemExit(0)
         porta = conn_init.recv(5)
@@ -607,8 +607,9 @@ class Client(threading.Thread):
         conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         conn.connect((self.host, porte))
 
-        self.p2pGame.writeToScreen("Connected to: " + self.host +
-                      " on port: " + str(porte), "System")
+        self.p2pGame.writeToScreen("Connecté à: " + self.host +
+                      " sur le port: " + str(porte), "Système")
+        self.p2pgame.menubar.entryconfig("TicTacToe", state="enabled")
 
         self.p2pGame.statusConnect.set("Disconnect")
         self.p2pGame.connectionButton.config(state=NORMAL)
