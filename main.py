@@ -552,7 +552,7 @@ class Server(threading.Thread):
         conn, addr = serv.accept()
         self.p2pgame.connectionList.append(conn)  # add an array entry for this connection
         self.p2pgame.writeToScreen(str(addr[0] + " est connecté"), "Système")
-        self.p2pgame.menubar.entryconfig("TicTacToe", state="enabled")
+        self.p2pgame.menubar.entryconfig("TicTacToe", state="active")
         self.p2pgame.statusConnect.set("Déconnecté")
         self.p2pgame.connectionButton.config(state=NORMAL)
 
@@ -609,7 +609,7 @@ class Client(threading.Thread):
 
         self.p2pGame.writeToScreen("Connecté à: " + self.host +
                       " sur le port: " + str(porte), "Système")
-        self.p2pgame.menubar.entryconfig("TicTacToe", state="enabled")
+        self.p2pGame.menubar.entryconfig("TicTacToe", state="active")
 
         self.p2pGame.statusConnect.set("Disconnect")
         self.p2pGame.connectionButton.config(state=NORMAL)
