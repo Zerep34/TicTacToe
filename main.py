@@ -16,6 +16,7 @@ class P2pGame:
         self.port = 0
         self.top = ""
         self.isReady = False
+        self.nbJoueurReady = 0
 
         self.mainTextArea = 0
 
@@ -48,7 +49,7 @@ class P2pGame:
 
         main_body.pack()
 
-        self.mainTextArea.insert(END, "Bienvenue dans dans ce Tic Tac Toe!")
+        self.mainTextArea.insert(END, "Bienvenue dans ce Tic Tac Toe!")
         self.mainTextArea.config(state=DISABLED)
 
         self.text_input = Entry(self.root, width=60)
@@ -354,6 +355,7 @@ class P2pGame:
         self.menubar.entryconfig("TicTacToe", state="disabled")
         self.TicGame = Game(root, self, Player=self.PLAYER_TYPE)
         self.sendReadyToPlay("--R")
+        self.nbJoueurReady += 1
         self.TicGame.mainloop()
 
 
@@ -497,6 +499,11 @@ class P2pGame:
                     self.playerTurn = 'X'
                 elif ("--R" == data):
                     self.isReady = True
+                    self.nbJoueurReady += 1
+                    self.writeToScreen("L'autre joueur est prêt à jouer.", "Système")
+                    if self.nbJoueurReady == 2:
+                        self.placeText("Les deux joueurs sont prêts à Serveur de commencer")
+
                 else:
                     self.writeToScreen(data, self.usernameList[conn])
 
