@@ -454,8 +454,13 @@ class P2pGame:
 
     def processUserText(self, event):
         data = self.text_input.get()
-        self.placeText(data)
-        self.text_input.delete(0, END)
+        if(not str(data).startswith("--")):
+            self.placeText(data)
+            self.text_input.delete(0, END)
+        else:
+            self.placeText("Vous ne pouvez pas envoyer de phrase commencant par '--'.")
+            self.text_input.delete(0, END)
+
 
 
     """
