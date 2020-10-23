@@ -502,7 +502,8 @@ class P2pGame:
                     self.nbJoueurReady += 1
                     self.writeToScreen("L'autre joueur est prêt à jouer.", "Système")
                     if self.nbJoueurReady == 2:
-                        self.placeText("Les deux joueurs sont prêts à Serveur de commencer")
+                        self.placeText("Les deux joueurs sont prêts")
+                        self.placeText("Serveur commence")
 
                 else:
                     self.writeToScreen(data, self.usernameList[conn])
