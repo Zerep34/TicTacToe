@@ -15,6 +15,7 @@ class P2pGame:
         self.location = 0
         self.port = 0
         self.top = ""
+        self.isReady= False
 
         self.mainTextArea = 0
 
@@ -352,6 +353,7 @@ class P2pGame:
         # top.grab_set()
         self.menubar.entryconfig("TicTacToe", state="disabled")
         self.TicGame = Game(root, self, Player=self.PLAYER_TYPE)
+        self.sendReadyToPlay("--R")
         self.TicGame.mainloop()
 
 
@@ -407,8 +409,15 @@ class P2pGame:
 
 
     def sendTicTacToeData(self, text):
-
         if("--" in text):
+            for person in self.connectionList:
+                self.socketSend(person, text)
+        else:
+            return
+
+
+    def sendReadyToPlay(self, text):
+        if("--R" in text):
             for person in self.connectionList:
                 self.socketSend(person, text)
         else:
@@ -481,6 +490,8 @@ class P2pGame:
                     self.TicGame.new_board()
                     self.TicGame.gamestate = self.TicGame.FIRST_PLAYER
                     self.playerTurn = 'X'
+                elif ("--R" in data):
+                    self.isReady = True
                 else:
                     self.writeToScreen(data, self.usernameList[conn])
 
