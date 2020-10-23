@@ -115,15 +115,15 @@ class Game(Tk):
 
         self.canvas.delete('all')
         if outcome == 'X Gagne':
-            wintext = 'X wins'
+            wintext = 'X Gagne'
             wincolor = self.X_COLOR
 
         elif outcome == 'O Gagne':
-            wintext = 'O wins'
+            wintext = 'O Gagne'
             wincolor = self.O_COLOR
 
         elif outcome == 'Egalité':
-            wintext = 'Draw'
+            wintext = 'Egalité'
             wincolor = self.DRAW_SCREEN_COLOR
 
         self.canvas.create_rectangle(
