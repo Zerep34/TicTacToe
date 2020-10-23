@@ -15,7 +15,7 @@ class P2pGame:
         self.location = 0
         self.port = 0
         self.top = ""
-        self.isReady= False
+        self.isReady = False
 
         self.mainTextArea = 0
 
@@ -495,7 +495,7 @@ class P2pGame:
                     self.TicGame.new_board()
                     self.TicGame.gamestate = self.TicGame.FIRST_PLAYER
                     self.playerTurn = 'X'
-                elif ("--R" in data):
+                elif ("--R" == data):
                     self.isReady = True
                 else:
                     self.writeToScreen(data, self.usernameList[conn])

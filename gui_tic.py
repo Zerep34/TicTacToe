@@ -158,7 +158,7 @@ class Game(Tk):
 
 
         #duplication /!\
-        if (self.board[y][x] == self.EMPTY & self.p2pGame.isReady):
+        if (self.board[y][x] == self.EMPTY and self.p2pGame.isReady):
             if(self.p2pGame.playerTurn == 'X' and self.player == 1):
                 self.new_move(x, y, self.player)
 
